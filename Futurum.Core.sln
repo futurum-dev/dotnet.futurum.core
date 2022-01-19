@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Futurum.Core", "src\Futurum.Core\Futurum.Core.csproj", "{B8A44FC9-7508-49B6-B6A1-84F804405D66}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Futurum.Core.Tests", "test\Futurum.Core.Tests\Futurum.Core.Tests.csproj", "{DA07AE8B-112E-4997-93F7-3FD1714A5963}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{3D7AAB21-9DB2-4CB1-B75B-8EA725EF1983}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+		LICENSE = LICENSE
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{A2CA104E-F0FF-4E84-A7A1-5701F45B3CE6}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = src\Directory.Build.props
+		ci.yml = .github\workflows\ci.yml
+		release.yml = .github\workflows\release.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{060B9A8D-83E4-4301-AF71-FB63448A8CF3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B8A44FC9-7508-49B6-B6A1-84F804405D66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8A44FC9-7508-49B6-B6A1-84F804405D66}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8A44FC9-7508-49B6-B6A1-84F804405D66}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8A44FC9-7508-49B6-B6A1-84F804405D66}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA07AE8B-112E-4997-93F7-3FD1714A5963}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA07AE8B-112E-4997-93F7-3FD1714A5963}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA07AE8B-112E-4997-93F7-3FD1714A5963}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA07AE8B-112E-4997-93F7-3FD1714A5963}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{DA07AE8B-112E-4997-93F7-3FD1714A5963} = {060B9A8D-83E4-4301-AF71-FB63448A8CF3}
+	EndGlobalSection
+EndGlobal
