@@ -1,5 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("Futurum.Core.Polly")]
 [assembly: InternalsVisibleTo("Futurum.Core.Tests")]
 [assembly: InternalsVisibleTo("Futurum.Test")]
 
