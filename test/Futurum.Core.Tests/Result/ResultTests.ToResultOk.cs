@@ -35,18 +35,4 @@ public class ResultExtensionsToOkResultTests
             result.ShouldBeSuccessWithValue(value);
         }
     }
-
-    public class ResultToAsyncResult
-    {
-        [Fact]
-        public async Task ToResultAsync()
-        {
-            var value = Guid.NewGuid();
-            var resultValue = value.ToResultOk();
-
-            var result = await resultValue.ToResultAsync();
-
-            result.ShouldBeSuccessWithValue(value);
-        }
-    }
 }
