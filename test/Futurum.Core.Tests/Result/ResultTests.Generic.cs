@@ -23,7 +23,7 @@ public class ResultGenericTests
             {
                 Action action = () => Core.Result.Result.Ok((StubClass) null);
 
-                action.Should().Throw<ArgumentNullException>();
+                action.Should().Throw<ArgumentNullException>().WithMessage("Result Success must specify an associated value. (Parameter 'value')");
             }
         }
 
@@ -36,7 +36,7 @@ public class ResultGenericTests
 
                 Action action = () => Core.Result.Result.Fail<StubClass>(errorMessage);
 
-                action.Should().Throw<ArgumentNullException>();
+                action.Should().Throw<ArgumentNullException>().WithMessage("Result Failure must specify an associated error. (Parameter 'error')");
             }
 
             [Fact]
@@ -46,7 +46,7 @@ public class ResultGenericTests
 
                 Action action = () => Core.Result.Result.Fail<StubClass>(errorMessage);
 
-                action.Should().Throw<ArgumentNullException>();
+                action.Should().Throw<ArgumentNullException>().WithMessage("Result Failure must specify an associated error. (Parameter 'error')");
             }
 
             [Fact]
@@ -54,7 +54,7 @@ public class ResultGenericTests
             {
                 Action action = () => Core.Result.Result.Fail<StubClass>((IResultError) null);
 
-                action.Should().Throw<ArgumentNullException>();
+                action.Should().Throw<ArgumentNullException>().WithMessage("Result Failure must specify an associated error. (Parameter 'error')");
             }
 
             [Fact]
@@ -62,7 +62,7 @@ public class ResultGenericTests
             {
                 Action action = () => Core.Result.Result.Fail<StubClass>(ResultErrorEmpty.Value);
 
-                action.Should().Throw<ArgumentNullException>();
+                action.Should().Throw<ArgumentNullException>().WithMessage("Result Failure must specify an associated error. (Parameter 'error')");
             }
         }
 

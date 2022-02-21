@@ -25,7 +25,7 @@ public class ResultTests
 
                 Action action = () => Core.Result.Result.Fail(errorMessage);
 
-                action.Should().Throw<ArgumentNullException>();
+                action.Should().Throw<ArgumentNullException>().WithMessage("Result Failure must specify an associated error. (Parameter 'error')");
             }
 
             [Fact]
@@ -35,7 +35,7 @@ public class ResultTests
 
                 Action action = () => Core.Result.Result.Fail(errorMessage);
 
-                action.Should().Throw<ArgumentNullException>();
+                action.Should().Throw<ArgumentNullException>().WithMessage("Result Failure must specify an associated error. (Parameter 'error')");
             }
 
             [Fact]
@@ -43,7 +43,7 @@ public class ResultTests
             {
                 Action action = () => Core.Result.Result.Fail((IResultError) null);
 
-                action.Should().Throw<ArgumentNullException>();
+                action.Should().Throw<ArgumentNullException>().WithMessage("Result Failure must specify an associated error. (Parameter 'error')");
             }
 
             [Fact]
@@ -51,7 +51,7 @@ public class ResultTests
             {
                 Action action = () => Core.Result.Result.Fail(ResultErrorEmpty.Value);
 
-                action.Should().Throw<ArgumentNullException>();
+                action.Should().Throw<ArgumentNullException>().WithMessage("Result Failure must specify an associated error. (Parameter 'error')");
             }
         }
 
