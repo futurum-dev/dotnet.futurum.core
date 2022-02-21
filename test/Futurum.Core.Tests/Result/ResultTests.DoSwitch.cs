@@ -18,182 +18,426 @@ public class ResultDoSwitchTests
     {
         public class NonGeneric
         {
-            public class WithoutErrorPayloadOnFailure
+            public class Sync
             {
-                [Fact]
-                public void FailureInput_Matches()
+                public class WithoutErrorPayloadOnFailure
                 {
-                    var trueWasCalled = false;
-                    var falseWasCalled = false;
+                    [Fact]
+                    public void FailureInput_Matches()
+                    {
+                        var trueWasCalled = false;
+                        var falseWasCalled = false;
 
-                    var resultInput = Core.Result.Result.Fail(ErrorMessage);
+                        var resultInput = Core.Result.Result.Fail(ErrorMessage);
 
-                    var returnResult = resultInput.DoSwitch(() => { trueWasCalled = true; },
-                                                            () => { falseWasCalled = true; });
+                        var returnResult = resultInput.DoSwitch(() => { trueWasCalled = true; },
+                                                                () => { falseWasCalled = true; });
 
-                    returnResult.ShouldBeFailureWithError(ErrorMessage);
-                    trueWasCalled.Should().BeFalse();
-                    falseWasCalled.Should().BeTrue();
+                        returnResult.ShouldBeFailureWithError(ErrorMessage);
+                        trueWasCalled.Should().BeFalse();
+                        falseWasCalled.Should().BeTrue();
+                    }
+
+                    [Fact]
+                    public void SuccessInput()
+                    {
+                        var trueWasCalled = false;
+                        var falseWasCalled = false;
+
+                        var resultInput = Core.Result.Result.Ok();
+
+                        var returnResult = resultInput.DoSwitch(() => { trueWasCalled = true; },
+                                                                () => { falseWasCalled = true; });
+
+                        returnResult.ShouldBeSuccess();
+                        trueWasCalled.Should().BeTrue();
+                        falseWasCalled.Should().BeFalse();
+                    }
                 }
 
-                [Fact]
-                public void SuccessInput()
+                public class WithErrorPayloadOnFailure
                 {
-                    var trueWasCalled = false;
-                    var falseWasCalled = false;
+                    [Fact]
+                    public void FailureInput_Matches()
+                    {
+                        var trueWasCalled = false;
+                        var falseWasCalled = false;
 
-                    var resultInput = Core.Result.Result.Ok();
+                        IResultError passedError = null;
 
-                    var returnResult = resultInput.DoSwitch(() => { trueWasCalled = true; },
-                                                            () => { falseWasCalled = true; });
+                        var resultInput = Core.Result.Result.Fail(ErrorMessage);
 
-                    returnResult.ShouldBeSuccess();
-                    trueWasCalled.Should().BeTrue();
-                    falseWasCalled.Should().BeFalse();
+                        var returnResult = resultInput.DoSwitch(() => { trueWasCalled = true; },
+                                                                error =>
+                                                                {
+                                                                    passedError = error;
+
+                                                                    falseWasCalled = true;
+                                                                });
+
+                        returnResult.ShouldBeFailureWithError(ErrorMessage);
+                        trueWasCalled.Should().BeFalse();
+                        falseWasCalled.Should().BeTrue();
+                        passedError.ShouldBeError(ErrorMessage);
+                    }
+
+                    [Fact]
+                    public void SuccessInput()
+                    {
+                        var trueWasCalled = false;
+                        var falseWasCalled = false;
+
+                        var resultInput = Core.Result.Result.Ok();
+
+                        var returnResult = resultInput.DoSwitch(() => { trueWasCalled = true; },
+                                                                _ => { falseWasCalled = true; });
+
+                        returnResult.ShouldBeSuccess();
+                        trueWasCalled.Should().BeTrue();
+                        falseWasCalled.Should().BeFalse();
+                    }
                 }
             }
 
-            public class WithErrorPayloadOnFailure
+            public class Async
             {
-                [Fact]
-                public void FailureInput_Matches()
+                public class WithoutErrorPayloadOnFailure
                 {
-                    var trueWasCalled = false;
-                    var falseWasCalled = false;
+                    [Fact]
+                    public async Task FailureInput_Matches()
+                    {
+                        var trueWasCalled = false;
+                        var falseWasCalled = false;
 
-                    IResultError passedError = null;
+                        var resultInput = Core.Result.Result.Fail(ErrorMessage);
 
-                    var resultInput = Core.Result.Result.Fail(ErrorMessage);
+                        var returnResult = await resultInput.DoSwitchAsync(() =>
+                                                                           {
+                                                                               trueWasCalled = true;
+                                                                               return Task.CompletedTask;
+                                                                           },
+                                                                           () =>
+                                                                           {
+                                                                               falseWasCalled = true;
+                                                                               return Task.CompletedTask;
+                                                                           });
 
-                    var returnResult = resultInput.DoSwitch(() => { trueWasCalled = true; },
-                                                            error =>
-                                                            {
-                                                                passedError = error;
+                        returnResult.ShouldBeFailureWithError(ErrorMessage);
+                        trueWasCalled.Should().BeFalse();
+                        falseWasCalled.Should().BeTrue();
+                    }
 
-                                                                falseWasCalled = true;
-                                                            });
+                    [Fact]
+                    public async Task SuccessInput()
+                    {
+                        var trueWasCalled = false;
+                        var falseWasCalled = false;
 
-                    returnResult.ShouldBeFailureWithError(ErrorMessage);
-                    trueWasCalled.Should().BeFalse();
-                    falseWasCalled.Should().BeTrue();
-                    passedError.ShouldBeError(ErrorMessage);
+                        var resultInput = Core.Result.Result.Ok();
+
+                        var returnResult = await resultInput.DoSwitchAsync(() =>
+                                                                           {
+                                                                               trueWasCalled = true;
+                                                                               return Task.CompletedTask;
+                                                                           },
+                                                                           () =>
+                                                                           {
+                                                                               falseWasCalled = true;
+                                                                               return Task.CompletedTask;
+                                                                           });
+
+                        returnResult.ShouldBeSuccess();
+                        trueWasCalled.Should().BeTrue();
+                        falseWasCalled.Should().BeFalse();
+                    }
                 }
 
-                [Fact]
-                public void SuccessInput()
+                public class WithErrorPayloadOnFailure
                 {
-                    var trueWasCalled = false;
-                    var falseWasCalled = false;
+                    [Fact]
+                    public async Task FailureInput_Matches()
+                    {
+                        var trueWasCalled = false;
+                        var falseWasCalled = false;
 
-                    var resultInput = Core.Result.Result.Ok();
+                        IResultError passedError = null;
 
-                    var returnResult = resultInput.DoSwitch(() => { trueWasCalled = true; },
-                                                            _ => { falseWasCalled = true; });
+                        var resultInput = Core.Result.Result.Fail(ErrorMessage);
 
-                    returnResult.ShouldBeSuccess();
-                    trueWasCalled.Should().BeTrue();
-                    falseWasCalled.Should().BeFalse();
+                        var returnResult = await resultInput.DoSwitchAsync(() =>
+                                                                           {
+                                                                               trueWasCalled = true;
+                                                                               return Task.CompletedTask;
+                                                                           },
+                                                                           error =>
+                                                                           {
+                                                                               passedError = error;
+
+                                                                               falseWasCalled = true;
+
+                                                                               return Task.CompletedTask;
+                                                                           });
+
+                        returnResult.ShouldBeFailureWithError(ErrorMessage);
+                        trueWasCalled.Should().BeFalse();
+                        falseWasCalled.Should().BeTrue();
+                        passedError.ShouldBeError(ErrorMessage);
+                    }
+
+                    [Fact]
+                    public async Task SuccessInput()
+                    {
+                        var trueWasCalled = false;
+                        var falseWasCalled = false;
+
+                        var resultInput = Core.Result.Result.Ok();
+
+                        var returnResult = await resultInput.DoSwitchAsync(() =>
+                                                                           {
+                                                                               trueWasCalled = true;
+                                                                               return Task.CompletedTask;
+                                                                           },
+                                                                           _ =>
+                                                                           {
+                                                                               falseWasCalled = true;
+                                                                               return Task.CompletedTask;
+                                                                           });
+
+                        returnResult.ShouldBeSuccess();
+                        trueWasCalled.Should().BeTrue();
+                        falseWasCalled.Should().BeFalse();
+                    }
                 }
             }
         }
 
         public class Generic
         {
-            public class WithoutErrorPayloadOnFailure
+            public class Sync
             {
-                [Fact]
-                public void FailureInput_Matches()
+                public class WithoutErrorPayloadOnFailure
                 {
-                    var trueWasCalled = false;
-                    var falseWasCalled = false;
+                    [Fact]
+                    public void FailureInput_Matches()
+                    {
+                        var trueWasCalled = false;
+                        var falseWasCalled = false;
 
-                    var resultInput = Core.Result.Result.Fail<Guid>(ErrorMessage);
+                        var resultInput = Core.Result.Result.Fail<Guid>(ErrorMessage);
 
-                    var returnResult = resultInput.DoSwitch(_ => { trueWasCalled = true; },
-                                                            () => { falseWasCalled = true; });
+                        var returnResult = resultInput.DoSwitch(_ => { trueWasCalled = true; },
+                                                                () => { falseWasCalled = true; });
 
-                    returnResult.ShouldBeFailureWithError(ErrorMessage);
-                    trueWasCalled.Should().BeFalse();
-                    falseWasCalled.Should().BeTrue();
+                        returnResult.ShouldBeFailureWithError(ErrorMessage);
+                        trueWasCalled.Should().BeFalse();
+                        falseWasCalled.Should().BeTrue();
+                    }
+
+                    [Fact]
+                    public void SuccessInput()
+                    {
+                        var inputValue = Guid.NewGuid();
+
+                        var trueWasCalled = false;
+                        var falseWasCalled = false;
+
+                        var passedValue = Guid.Empty;
+
+                        var resultInput = Core.Result.Result.Ok(inputValue);
+
+                        var returnResult = resultInput.DoSwitch(value =>
+                                                                {
+                                                                    passedValue = value;
+
+                                                                    trueWasCalled = true;
+                                                                },
+                                                                () => { falseWasCalled = true; });
+
+                        returnResult.ShouldBeSuccessWithValue(inputValue);
+                        trueWasCalled.Should().BeTrue();
+                        falseWasCalled.Should().BeFalse();
+                        passedValue.Should().Be(inputValue);
+                    }
                 }
 
-                [Fact]
-                public void SuccessInput()
+                public class WithErrorPayloadOnFailure
                 {
-                    var inputValue = Guid.NewGuid();
+                    [Fact]
+                    public void FailureInput_Matches()
+                    {
+                        var trueWasCalled = false;
+                        var falseWasCalled = false;
 
-                    var trueWasCalled = false;
-                    var falseWasCalled = false;
+                        IResultError passedError = null;
 
-                    var passedValue = Guid.Empty;
+                        var resultInput = Core.Result.Result.Fail<Guid>(ErrorMessage);
 
-                    var resultInput = Core.Result.Result.Ok(inputValue);
+                        var returnResult = resultInput.DoSwitch(_ => { trueWasCalled = true; },
+                                                                error =>
+                                                                {
+                                                                    passedError = error;
 
-                    var returnResult = resultInput.DoSwitch(value =>
-                                                            {
-                                                                passedValue = value;
+                                                                    falseWasCalled = true;
+                                                                });
 
-                                                                trueWasCalled = true;
-                                                            },
-                                                            () => { falseWasCalled = true; });
+                        returnResult.ShouldBeFailureWithError(ErrorMessage);
+                        trueWasCalled.Should().BeFalse();
+                        falseWasCalled.Should().BeTrue();
+                        passedError.ShouldBeError(ErrorMessage);
+                    }
 
-                    returnResult.ShouldBeSuccessWithValue(inputValue);
-                    trueWasCalled.Should().BeTrue();
-                    falseWasCalled.Should().BeFalse();
-                    passedValue.Should().Be(inputValue);
+                    [Fact]
+                    public void SuccessInput()
+                    {
+                        var inputValue = Guid.NewGuid();
+
+                        var trueWasCalled = false;
+                        var falseWasCalled = false;
+
+                        var passedValue = Guid.Empty;
+
+                        var resultInput = Core.Result.Result.Ok(inputValue);
+
+                        var returnResult = resultInput.DoSwitch(value =>
+                                                                {
+                                                                    passedValue = value;
+
+                                                                    trueWasCalled = true;
+                                                                },
+                                                                _ => { falseWasCalled = true; });
+
+                        returnResult.ShouldBeSuccessWithValue(inputValue);
+                        trueWasCalled.Should().BeTrue();
+                        falseWasCalled.Should().BeFalse();
+                        passedValue.Should().Be(inputValue);
+                    }
                 }
             }
 
-            public class WithErrorPayloadOnFailure
+            public class Async
             {
-                [Fact]
-                public void FailureInput_Matches()
+                public class WithoutErrorPayloadOnFailure
                 {
-                    var trueWasCalled = false;
-                    var falseWasCalled = false;
+                    [Fact]
+                    public async Task FailureInput_Matches()
+                    {
+                        var trueWasCalled = false;
+                        var falseWasCalled = false;
 
-                    IResultError passedError = null;
+                        var resultInput = Core.Result.Result.Fail<Guid>(ErrorMessage);
 
-                    var resultInput = Core.Result.Result.Fail<Guid>(ErrorMessage);
+                        var returnResult = await resultInput.DoSwitchAsync(_ =>
+                                                                           {
+                                                                               trueWasCalled = true;
+                                                                               return Task.CompletedTask;
+                                                                           },
+                                                                           () =>
+                                                                           {
+                                                                               falseWasCalled = true;
+                                                                               return Task.CompletedTask;
+                                                                           });
 
-                    var returnResult = resultInput.DoSwitch(_ => { trueWasCalled = true; },
-                                                            error =>
-                                                            {
-                                                                passedError = error;
+                        returnResult.ShouldBeFailureWithError(ErrorMessage);
+                        trueWasCalled.Should().BeFalse();
+                        falseWasCalled.Should().BeTrue();
+                    }
 
-                                                                falseWasCalled = true;
-                                                            });
+                    [Fact]
+                    public async Task SuccessInput()
+                    {
+                        var inputValue = Guid.NewGuid();
 
-                    returnResult.ShouldBeFailureWithError(ErrorMessage);
-                    trueWasCalled.Should().BeFalse();
-                    falseWasCalled.Should().BeTrue();
-                    passedError.ShouldBeError(ErrorMessage);
+                        var trueWasCalled = false;
+                        var falseWasCalled = false;
+
+                        var passedValue = Guid.Empty;
+
+                        var resultInput = Core.Result.Result.Ok(inputValue);
+
+                        var returnResult = await resultInput.DoSwitchAsync(value =>
+                                                                           {
+                                                                               passedValue = value;
+
+                                                                               trueWasCalled = true;
+
+                                                                               return Task.CompletedTask;
+                                                                           },
+                                                                           () =>
+                                                                           {
+                                                                               falseWasCalled = true;
+                                                                               return Task.CompletedTask;
+                                                                           });
+
+                        returnResult.ShouldBeSuccessWithValue(inputValue);
+                        trueWasCalled.Should().BeTrue();
+                        falseWasCalled.Should().BeFalse();
+                        passedValue.Should().Be(inputValue);
+                    }
                 }
 
-                [Fact]
-                public void SuccessInput()
+                public class WithErrorPayloadOnFailure
                 {
-                    var inputValue = Guid.NewGuid();
+                    [Fact]
+                    public async Task FailureInput_Matches()
+                    {
+                        var trueWasCalled = false;
+                        var falseWasCalled = false;
 
-                    var trueWasCalled = false;
-                    var falseWasCalled = false;
+                        IResultError passedError = null;
 
-                    var passedValue = Guid.Empty;
+                        var resultInput = Core.Result.Result.Fail<Guid>(ErrorMessage);
 
-                    var resultInput = Core.Result.Result.Ok(inputValue);
+                        var returnResult = await resultInput.DoSwitchAsync(_ =>
+                                                                           {
+                                                                               trueWasCalled = true;
+                                                                               return Task.CompletedTask;
+                                                                           },
+                                                                           error =>
+                                                                           {
+                                                                               passedError = error;
 
-                    var returnResult = resultInput.DoSwitch(value =>
-                                                            {
-                                                                passedValue = value;
+                                                                               falseWasCalled = true;
 
-                                                                trueWasCalled = true;
-                                                            },
-                                                            _ => { falseWasCalled = true; });
+                                                                               return Task.CompletedTask;
+                                                                           });
 
-                    returnResult.ShouldBeSuccessWithValue(inputValue);
-                    trueWasCalled.Should().BeTrue();
-                    falseWasCalled.Should().BeFalse();
-                    passedValue.Should().Be(inputValue);
+                        returnResult.ShouldBeFailureWithError(ErrorMessage);
+                        trueWasCalled.Should().BeFalse();
+                        falseWasCalled.Should().BeTrue();
+                        passedError.ShouldBeError(ErrorMessage);
+                    }
+
+                    [Fact]
+                    public async Task SuccessInput()
+                    {
+                        var inputValue = Guid.NewGuid();
+
+                        var trueWasCalled = false;
+                        var falseWasCalled = false;
+
+                        var passedValue = Guid.Empty;
+
+                        var resultInput = Core.Result.Result.Ok(inputValue);
+
+                        var returnResult = await resultInput.DoSwitchAsync(value =>
+                                                                           {
+                                                                               passedValue = value;
+
+                                                                               trueWasCalled = true;
+
+                                                                               return Task.CompletedTask;
+                                                                           },
+                                                                           _ =>
+                                                                           {
+                                                                               falseWasCalled = true;
+                                                                               return Task.CompletedTask;
+                                                                           });
+
+                        returnResult.ShouldBeSuccessWithValue(inputValue);
+                        trueWasCalled.Should().BeTrue();
+                        falseWasCalled.Should().BeFalse();
+                        passedValue.Should().Be(inputValue);
+                    }
                 }
             }
         }
