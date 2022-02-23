@@ -17,6 +17,10 @@
         <None Include="..\..\assets\dotnet-logo.png" Pack="true" PackagePath="\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="System.Linq.Async" Version="6.0.1" />
+    </ItemGroup>
+
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
         <DocumentationFile>bin\Debug\net6.0\Futurum.Core.xml</DocumentationFile>
     </PropertyGroup>

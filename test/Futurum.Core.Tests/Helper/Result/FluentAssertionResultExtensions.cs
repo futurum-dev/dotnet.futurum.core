@@ -88,7 +88,47 @@ public static class FluentAssertionResultExtensions
     }
 
     /// <summary>
-    /// Specifies that the <see cref="Futurum.Core.Result.Result{T}"/> should be <see cref="Futurum.Core.Result.Result{T}.IsSuccess"/> true with equivalent to  <paramref name="value"/>.
+    /// Specifies that the <see cref="Futurum.Core.Result.Result{T}"/> should be <see cref="Futurum.Core.Result.Result{T}.IsSuccess"/> true with equivalent to <paramref name="value"/>.
+    /// </summary>
+    public static Task ShouldBeSuccessWithValueEquivalentToAsync<TData>(this Result<IAsyncEnumerable<TData>> result, IEnumerable<TData> value) =>
+        result.ShouldBeSuccessWithValueEquivalentToAsync(x => x, value);
+
+    /// <summary>
+    /// Specifies that the <see cref="Futurum.Core.Result.Result{T}"/> should be <see cref="Futurum.Core.Result.Result{T}.IsSuccess"/> true with equivalent to <paramref name="value"/>.
+    /// </summary>
+    public static async Task ShouldBeSuccessWithValueEquivalentToAsync<T, TData>(this Result<T> result, Func<T, IAsyncEnumerable<TData>> selectorFunc, IEnumerable<TData> value)
+    {
+        result.ShouldBeSuccess();
+
+        var asyncEnumerable = selectorFunc(result.Value.Value);
+
+        var left = await ConvertIAsyncEnumerableToIEnumerable(asyncEnumerable);
+
+        var right = value;
+
+        left.Should().BeEquivalentTo(right);
+
+        static async Task<IEnumerable<TData>> ConvertIAsyncEnumerableToIEnumerable(IAsyncEnumerable<TData> value)
+        {
+            var list = new List<TData>();
+
+            await foreach (var x in value)
+            {
+                list.Add(x);
+            }
+
+            return list;
+        }
+    }
+
+    /// <summary>
+    /// Specifies that the <see cref="Futurum.Core.Result.Result{T}"/> should be <see cref="Futurum.Core.Result.Result{T}.IsSuccess"/> true with equivalent to <paramref name="value"/>.
+    /// </summary>
+    public static Task ShouldBeSuccessWithValueEquivalentToAsync<TData>(this Result<IAsyncEnumerable<TData>> result, IAsyncEnumerable<TData> value) =>
+        result.ShouldBeSuccessWithValueEquivalentToAsync(x => x, value);
+
+    /// <summary>
+    /// Specifies that the <see cref="Futurum.Core.Result.Result{T}"/> should be <see cref="Futurum.Core.Result.Result{T}.IsSuccess"/> true with equivalent to <paramref name="value"/>.
     /// </summary>
     public static async Task ShouldBeSuccessWithValueEquivalentToAsync<T, TData>(this Result<T> result, Func<T, IAsyncEnumerable<TData>> selectorFunc, IAsyncEnumerable<TData> value)
     {
