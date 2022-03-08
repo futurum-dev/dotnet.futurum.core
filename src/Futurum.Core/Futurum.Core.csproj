@@ -7,7 +7,7 @@
     <PropertyGroup>
         <PackageId>Futurum.Core</PackageId>
         <PackageIcon>dotnet-logo.png</PackageIcon>
-        <Description>Small dotnet library providing Option and Result data types, based on the concepts behind 'Railway Oriented Programming'</Description>
+        <Description>A dotnet library providing Option and Result data types, based on the concepts behind 'Railway Oriented Programming'</Description>
         <PackageProjectUrl>https://www.futurum.dev/projects/dotnet-futurum.html</PackageProjectUrl>
         <RepositoryUrl>https://github.com/futurum-dev/dotnet.futurum.core</RepositoryUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
