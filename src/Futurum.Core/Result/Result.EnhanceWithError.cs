@@ -18,10 +18,10 @@ public readonly partial struct Result
     /// <summary>
     /// If <see cref="Result"/> <see cref="IsFailure"/> is true, then add additional error context
     /// </summary>
-    public Result EnhanceWithError(IResultErrorNonComposite error)
+    public Result EnhanceWithError(Func<IResultErrorNonComposite> error)
     {
         Result Failure(IResultError resultError) =>
-            Fail(resultError.EnhanceWithError(error));
+            Fail(resultError.EnhanceWithError(error()));
 
         return Compensate(Failure);
     }
@@ -43,10 +43,10 @@ public readonly partial struct Result<T>
     /// <summary>
     /// If <see cref="Result{T}"/> <see cref="IsFailure"/> is true, then add additional error context
     /// </summary>
-    public Result<T> EnhanceWithError(IResultErrorNonComposite error)
+    public Result<T> EnhanceWithError(Func<IResultErrorNonComposite> error)
     {
         Result<T> Failure(IResultError resultError) =>
-            Result.Fail<T>(resultError.EnhanceWithError(error));
+            Result.Fail<T>(resultError.EnhanceWithError(error()));
 
         return Compensate(Failure);
     }
@@ -82,7 +82,7 @@ public static partial class ResultExtensions
     /// <summary>
     /// If async <see cref="Result"/> <see cref="Result.IsFailure"/> is true, then add additional error context
     /// </summary>
-    public static Task<Result> EnhanceWithErrorAsync(this Task<Result> resultTask, IResultErrorNonComposite error)
+    public static Task<Result> EnhanceWithErrorAsync(this Task<Result> resultTask, Func<IResultErrorNonComposite> error)
     {
         Result Execute(Result result) => result.EnhanceWithError(error);
 
@@ -102,7 +102,7 @@ public static partial class ResultExtensions
     /// <summary>
     /// If async <see cref="Result{T}"/> <see cref="Result{T}.IsFailure"/> is true, then add additional error context
     /// </summary>
-    public static Task<Result<T>> EnhanceWithErrorAsync<T>(this Task<Result<T>> resultTask, IResultErrorNonComposite error)
+    public static Task<Result<T>> EnhanceWithErrorAsync<T>(this Task<Result<T>> resultTask, Func<IResultErrorNonComposite> error)
     {
         Result<T> Execute(Result<T> result) => result.EnhanceWithError(error);
 

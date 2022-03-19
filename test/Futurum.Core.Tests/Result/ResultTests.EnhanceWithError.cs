@@ -46,7 +46,7 @@ public class ResultEnhanceWithErrorTests
                 {
                     var resultInput = Core.Result.Result.Fail(ErrorMessage1);
 
-                    var result = resultInput.EnhanceWithError(ErrorMessage2.ToResultError());
+                    var result = resultInput.EnhanceWithError(() => ErrorMessage2.ToResultError());
 
                     result.ShouldBeFailureWithError(ErrorMessage2, ErrorMessage1);
                 }
@@ -56,7 +56,7 @@ public class ResultEnhanceWithErrorTests
                 {
                     var resultInput = Core.Result.Result.Ok();
 
-                    var result = resultInput.EnhanceWithError(ErrorMessage1.ToResultError());
+                    var result = resultInput.EnhanceWithError(() => ErrorMessage1.ToResultError());
 
                     result.ShouldBeSuccess();
                 }
@@ -97,7 +97,7 @@ public class ResultEnhanceWithErrorTests
                 {
                     var resultInput = Core.Result.Result.Fail<int>(ErrorMessage1);
 
-                    var result = resultInput.EnhanceWithError(ErrorMessage2.ToResultError());
+                    var result = resultInput.EnhanceWithError(() => ErrorMessage2.ToResultError());
 
                     result.ShouldBeFailureWithError(ErrorMessage2, ErrorMessage1);
                 }
@@ -109,7 +109,7 @@ public class ResultEnhanceWithErrorTests
 
                     var resultInput = Core.Result.Result.Ok(input);
 
-                    var result = resultInput.EnhanceWithError(ErrorMessage1.ToResultError());
+                    var result = resultInput.EnhanceWithError(() => ErrorMessage1.ToResultError());
 
                     result.ShouldBeSuccessWithValue(input);
                 }
@@ -151,7 +151,7 @@ public class ResultEnhanceWithErrorTests
                 {
                     var resultInput = Core.Result.Result.FailAsync(ErrorMessage1);
 
-                    var result = await resultInput.EnhanceWithErrorAsync(ErrorMessage2.ToResultError());
+                    var result = await resultInput.EnhanceWithErrorAsync(() => ErrorMessage2.ToResultError());
 
                     result.ShouldBeFailureWithError(ErrorMessage2, ErrorMessage1);
                 }
@@ -161,7 +161,7 @@ public class ResultEnhanceWithErrorTests
                 {
                     var resultInput = Core.Result.Result.OkAsync();
 
-                    var result = await resultInput.EnhanceWithErrorAsync(ErrorMessage1.ToResultError());
+                    var result = await resultInput.EnhanceWithErrorAsync(() => ErrorMessage1.ToResultError());
 
                     result.ShouldBeSuccess();
                 }
@@ -202,7 +202,7 @@ public class ResultEnhanceWithErrorTests
                 {
                     var resultInput = Core.Result.Result.FailAsync<int>(ErrorMessage1);
 
-                    var result = await resultInput.EnhanceWithErrorAsync(ErrorMessage2.ToResultError());
+                    var result = await resultInput.EnhanceWithErrorAsync(() => ErrorMessage2.ToResultError());
 
                     result.ShouldBeFailureWithError(ErrorMessage2, ErrorMessage1);
                 }
@@ -214,7 +214,7 @@ public class ResultEnhanceWithErrorTests
 
                     var resultInput = Core.Result.Result.OkAsync(input);
 
-                    var result = await resultInput.EnhanceWithErrorAsync(ErrorMessage1.ToResultError());
+                    var result = await resultInput.EnhanceWithErrorAsync(() => ErrorMessage1.ToResultError());
 
                     result.ShouldBeSuccessWithValue(input);
                 }
