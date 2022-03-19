@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 
 using Futurum.Core.Functional;
+using Futurum.Core.Result;
 using Futurum.Core.Tests.Helper.Result;
 
 using Xunit;
@@ -17,126 +18,263 @@ public class ResultTryTests
     {
         public class NoReturn
         {
-            [Fact]
-            public void Exception()
+            public class ErrorMessage
             {
-                Action action = () => throw new Exception(ErrorMessage1);
-                var result = Core.Result.Result.Try(action, () => ErrorMessage2);
+                [Fact]
+                public void Exception()
+                {
+                    Action action = () => throw new Exception(ErrorMessage1);
+                    var result = Core.Result.Result.Try(action, () => ErrorMessage2);
 
-                result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                }
+
+                [Fact]
+                public void Success()
+                {
+                    var result = Core.Result.Result.Try(Function.DoNothing,
+                                                        () => ErrorMessage2);
+
+                    result.ShouldBeSuccess();
+                }
             }
 
-            [Fact]
-            public void Success()
+            public class IResultError
             {
-                var result = Core.Result.Result.Try(Function.DoNothing,
-                                                    () => ErrorMessage2);
+                [Fact]
+                public void Exception()
+                {
+                    Action action = () => throw new Exception(ErrorMessage1);
+                    var result = Core.Result.Result.Try(action, () => ErrorMessage2.ToResultError());
 
-                result.ShouldBeSuccess();
+                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                }
+
+                [Fact]
+                public void Success()
+                {
+                    var result = Core.Result.Result.Try(Function.DoNothing,
+                                                        () => ErrorMessage2.ToResultError());
+
+                    result.ShouldBeSuccess();
+                }
             }
         }
 
         public class PayloadReturn
         {
-            [Fact]
-            public void Exception()
+            public class ErrorMessage
             {
-                var value = 1;
+                [Fact]
+                public void Exception()
+                {
+                    var value = 1;
 
-                var result = Core.Result.Result.Try(() =>
-                                                    {
-                                                        throw new Exception(ErrorMessage1);
+                    var result = Core.Result.Result.Try(() =>
+                                                        {
+                                                            throw new Exception(ErrorMessage1);
 
-                                                        return value;
-                                                    },
-                                                    () => ErrorMessage2);
+                                                            return value;
+                                                        },
+                                                        () => ErrorMessage2);
 
-                result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                }
+
+                [Fact]
+                public void Success()
+                {
+                    var value = 1;
+
+                    var result = Core.Result.Result.Try(() => value,
+                                                        () => ErrorMessage2);
+
+                    result.ShouldBeSuccessWithValue(value);
+                }
             }
 
-            [Fact]
-            public void Success()
+            public class IResultError
             {
-                var value = 1;
+                [Fact]
+                public void Exception()
+                {
+                    var value = 1;
 
-                var result = Core.Result.Result.Try(() => value,
-                                                    () => ErrorMessage2);
+                    var result = Core.Result.Result.Try(() =>
+                                                        {
+                                                            throw new Exception(ErrorMessage1);
 
-                result.ShouldBeSuccessWithValue(value);
+                                                            return value;
+                                                        },
+                                                        () => ErrorMessage2.ToResultError());
+
+                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                }
+
+                [Fact]
+                public void Success()
+                {
+                    var value = 1;
+
+                    var result = Core.Result.Result.Try(() => value,
+                                                        () => ErrorMessage2.ToResultError());
+
+                    result.ShouldBeSuccessWithValue(value);
+                }
             }
         }
 
         public class ResultReturn
         {
-            [Fact]
-            public void Exception()
+            public class ErrorMessage
             {
-                var result = Core.Result.Result.Try(() =>
-                                                    {
-                                                        throw new Exception(ErrorMessage1);
+                [Fact]
+                public void Exception()
+                {
+                    var result = Core.Result.Result.Try(() =>
+                                                        {
+                                                            throw new Exception(ErrorMessage1);
 
-                                                        return Core.Result.Result.Ok();
-                                                    },
-                                                    () => ErrorMessage2);
+                                                            return Core.Result.Result.Ok();
+                                                        },
+                                                        () => ErrorMessage2);
 
-                result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                }
+
+                [Fact]
+                public void Failure()
+                {
+                    var result = Core.Result.Result.Try(() => Core.Result.Result.Fail(ErrorMessage1),
+                                                        () => ErrorMessage2);
+
+                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                }
+
+                [Fact]
+                public void Success()
+                {
+                    var result = Core.Result.Result.Try(() => Core.Result.Result.Ok(),
+                                                        () => ErrorMessage2);
+
+                    result.ShouldBeSuccess();
+                }
             }
 
-            [Fact]
-            public void Failure()
+            public class IResultError
             {
-                var result = Core.Result.Result.Try(() => Core.Result.Result.Fail(ErrorMessage1),
-                                                    () => ErrorMessage2);
+                [Fact]
+                public void Exception()
+                {
+                    var result = Core.Result.Result.Try(() =>
+                                                        {
+                                                            throw new Exception(ErrorMessage1);
 
-                result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
-            }
+                                                            return Core.Result.Result.Ok();
+                                                        },
+                                                        () => ErrorMessage2.ToResultError());
 
-            [Fact]
-            public void Success()
-            {
-                var result = Core.Result.Result.Try(() => Core.Result.Result.Ok(),
-                                                    () => ErrorMessage2);
+                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                }
 
-                result.ShouldBeSuccess();
+                [Fact]
+                public void Failure()
+                {
+                    var result = Core.Result.Result.Try(() => Core.Result.Result.Fail(ErrorMessage1),
+                                                        () => ErrorMessage2.ToResultError());
+
+                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                }
+
+                [Fact]
+                public void Success()
+                {
+                    var result = Core.Result.Result.Try(() => Core.Result.Result.Ok(),
+                                                        () => ErrorMessage2.ToResultError());
+
+                    result.ShouldBeSuccess();
+                }
             }
         }
 
         public class PayloadResultReturn
         {
-            [Fact]
-            public void Exception()
+            public class ErrorMessage
             {
-                var value = 1;
+                [Fact]
+                public void Exception()
+                {
+                    var value = 1;
 
-                var result = Core.Result.Result.Try(() =>
-                                                    {
-                                                        throw new Exception(ErrorMessage1);
+                    var result = Core.Result.Result.Try(() =>
+                                                        {
+                                                            throw new Exception(ErrorMessage1);
 
-                                                        return Core.Result.Result.Ok(value);
-                                                    },
-                                                    () => ErrorMessage2);
+                                                            return Core.Result.Result.Ok(value);
+                                                        },
+                                                        () => ErrorMessage2);
 
-                result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                }
+
+                [Fact]
+                public void Failure()
+                {
+                    var result = Core.Result.Result.Try(() => Core.Result.Result.Fail<int>(ErrorMessage1),
+                                                        () => ErrorMessage2);
+
+                    result.ShouldBeFailureWithError(ErrorMessage1);
+                }
+
+                [Fact]
+                public void Success()
+                {
+                    var value = 1;
+
+                    var result = Core.Result.Result.Try(() => Core.Result.Result.Ok(value),
+                                                        () => ErrorMessage2);
+
+                    result.ShouldBeSuccessWithValue(value);
+                }
             }
 
-            [Fact]
-            public void Failure()
+            public class IResultError
             {
-                var result = Core.Result.Result.Try(() => Core.Result.Result.Fail<int>(ErrorMessage1),
-                                                    () => ErrorMessage2);
+                [Fact]
+                public void Exception()
+                {
+                    var value = 1;
 
-                result.ShouldBeFailureWithError(ErrorMessage1);
-            }
+                    var result = Core.Result.Result.Try(() =>
+                                                        {
+                                                            throw new Exception(ErrorMessage1);
 
-            [Fact]
-            public void Success()
-            {
-                var value = 1;
+                                                            return Core.Result.Result.Ok(value);
+                                                        },
+                                                        () => ErrorMessage2.ToResultError());
 
-                var result = Core.Result.Result.Try(() => Core.Result.Result.Ok(value),
-                                                    () => ErrorMessage2);
+                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                }
 
-                result.ShouldBeSuccessWithValue(value);
+                [Fact]
+                public void Failure()
+                {
+                    var result = Core.Result.Result.Try(() => Core.Result.Result.Fail<int>(ErrorMessage1),
+                                                        () => ErrorMessage2.ToResultError());
+
+                    result.ShouldBeFailureWithError(ErrorMessage1);
+                }
+
+                [Fact]
+                public void Success()
+                {
+                    var value = 1;
+
+                    var result = Core.Result.Result.Try(() => Core.Result.Result.Ok(value),
+                                                        () => ErrorMessage2.ToResultError());
+
+                    result.ShouldBeSuccessWithValue(value);
+                }
             }
         }
     }
@@ -145,156 +283,326 @@ public class ResultTryTests
     {
         public class NoReturn
         {
-            [Fact]
-            public async Task Exception()
+            public class ErrorMessage
             {
-                Func<Task> func = () => throw new Exception(ErrorMessage1);
-                var result = await Core.Result.Result.TryAsync(func, () => ErrorMessage2);
+                [Fact]
+                public async Task Exception()
+                {
+                    Func<Task> func = () => throw new Exception(ErrorMessage1);
+                    var result = await Core.Result.Result.TryAsync(func, () => ErrorMessage2);
 
-                result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                }
+
+                [Fact]
+                public async Task Success()
+                {
+                    var result = await Core.Result.Result.TryAsync(() => Task.CompletedTask,
+                                                                   () => ErrorMessage2);
+
+                    result.ShouldBeSuccess();
+                }
             }
 
-            [Fact]
-            public async Task Success()
+            public class IResultError
             {
-                var result = await Core.Result.Result.TryAsync(() => Task.CompletedTask,
-                                                               () => ErrorMessage2);
+                [Fact]
+                public async Task Exception()
+                {
+                    Func<Task> func = () => throw new Exception(ErrorMessage1);
+                    var result = await Core.Result.Result.TryAsync(func, () => ErrorMessage2.ToResultError());
 
-                result.ShouldBeSuccess();
+                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                }
+
+                [Fact]
+                public async Task Success()
+                {
+                    var result = await Core.Result.Result.TryAsync(() => Task.CompletedTask,
+                                                                   () => ErrorMessage2.ToResultError());
+
+                    result.ShouldBeSuccess();
+                }
             }
         }
 
         public class PayloadReturn
         {
-            [Fact]
-            public async Task Exception()
+            public class ErrorMessage
             {
-                var value = 1;
+                [Fact]
+                public async Task Exception()
+                {
+                    var value = 1;
 
-                var result = await Core.Result.Result.TryAsync(() =>
-                                                               {
-                                                                   throw new Exception(ErrorMessage1);
+                    var result = await Core.Result.Result.TryAsync(() =>
+                                                                   {
+                                                                       throw new Exception(ErrorMessage1);
 
-                                                                   return Task.FromResult(value);
-                                                               },
-                                                               () => ErrorMessage2);
+                                                                       return Task.FromResult(value);
+                                                                   },
+                                                                   () => ErrorMessage2);
 
-                result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                }
+
+                [Fact]
+                public async Task Success()
+                {
+                    var value = 1;
+
+                    var result = await Core.Result.Result.TryAsync(() => Task.FromResult(value),
+                                                                   () => ErrorMessage2);
+
+                    result.ShouldBeSuccessWithValue(value);
+                }
             }
 
-            [Fact]
-            public async Task Success()
+            public class IResultError
             {
-                var value = 1;
+                [Fact]
+                public async Task Exception()
+                {
+                    var value = 1;
 
-                var result = await Core.Result.Result.TryAsync(() => Task.FromResult(value),
-                                                               () => ErrorMessage2);
+                    var result = await Core.Result.Result.TryAsync(() =>
+                                                                   {
+                                                                       throw new Exception(ErrorMessage1);
 
-                result.ShouldBeSuccessWithValue(value);
+                                                                       return Task.FromResult(value);
+                                                                   },
+                                                                   () => ErrorMessage2.ToResultError());
+
+                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                }
+
+                [Fact]
+                public async Task Success()
+                {
+                    var value = 1;
+
+                    var result = await Core.Result.Result.TryAsync(() => Task.FromResult(value),
+                                                                   () => ErrorMessage2.ToResultError());
+
+                    result.ShouldBeSuccessWithValue(value);
+                }
             }
         }
 
         public class ValueTaskPayloadReturn
         {
-            [Fact]
-            public async Task Exception()
+            public class ErrorMessage
             {
-                var value = 1;
+                [Fact]
+                public async Task Exception()
+                {
+                    var value = 1;
 
-                var result = await Core.Result.Result.TryAsync(() =>
-                                                               {
-                                                                   throw new Exception(ErrorMessage1);
+                    var result = await Core.Result.Result.TryAsync(() =>
+                                                                   {
+                                                                       throw new Exception(ErrorMessage1);
 
-                                                                   return ValueTask.FromResult(value);
-                                                               },
-                                                               () => ErrorMessage2);
+                                                                       return ValueTask.FromResult(value);
+                                                                   },
+                                                                   () => ErrorMessage2);
 
-                result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                }
+
+                [Fact]
+                public async Task Success()
+                {
+                    var value = 1;
+
+                    var result = await Core.Result.Result.TryAsync(() => ValueTask.FromResult(value),
+                                                                   () => ErrorMessage2);
+
+                    result.ShouldBeSuccessWithValue(value);
+                }
             }
 
-            [Fact]
-            public async Task Success()
+            public class IResultError
             {
-                var value = 1;
+                [Fact]
+                public async Task Exception()
+                {
+                    var value = 1;
 
-                var result = await Core.Result.Result.TryAsync(() => ValueTask.FromResult(value),
-                                                               () => ErrorMessage2);
+                    var result = await Core.Result.Result.TryAsync(() =>
+                                                                   {
+                                                                       throw new Exception(ErrorMessage1);
 
-                result.ShouldBeSuccessWithValue(value);
+                                                                       return ValueTask.FromResult(value);
+                                                                   },
+                                                                   () => ErrorMessage2.ToResultError());
+
+                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                }
+
+                [Fact]
+                public async Task Success()
+                {
+                    var value = 1;
+
+                    var result = await Core.Result.Result.TryAsync(() => ValueTask.FromResult(value),
+                                                                   () => ErrorMessage2.ToResultError());
+
+                    result.ShouldBeSuccessWithValue(value);
+                }
             }
         }
 
         public class ResultReturn
         {
-            [Fact]
-            public async Task Exception()
+            public class ErrorMessage
             {
-                var result = await Core.Result.Result.TryAsync(() =>
-                                                               {
-                                                                   throw new Exception(ErrorMessage1);
+                [Fact]
+                public async Task Exception()
+                {
+                    var result = await Core.Result.Result.TryAsync(() =>
+                                                                   {
+                                                                       throw new Exception(ErrorMessage1);
 
-                                                                   return Core.Result.Result.OkAsync();
-                                                               },
-                                                               () => ErrorMessage2);
+                                                                       return Core.Result.Result.OkAsync();
+                                                                   },
+                                                                   () => ErrorMessage2);
 
-                result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                }
+
+                [Fact]
+                public async Task Failure()
+                {
+                    var result = await Core.Result.Result.TryAsync(() => Core.Result.Result.FailAsync(ErrorMessage1),
+                                                                   () => ErrorMessage2);
+
+                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                }
+
+                [Fact]
+                public async Task Success()
+                {
+                    var result = await Core.Result.Result.TryAsync(() => Core.Result.Result.OkAsync(),
+                                                                   () => ErrorMessage2);
+
+                    result.ShouldBeSuccess();
+                }
             }
 
-            [Fact]
-            public async Task Failure()
+            public class IResultError
             {
-                var result = await Core.Result.Result.TryAsync(() => Core.Result.Result.FailAsync(ErrorMessage1),
-                                                               () => ErrorMessage2);
+                [Fact]
+                public async Task Exception()
+                {
+                    var result = await Core.Result.Result.TryAsync(() =>
+                                                                   {
+                                                                       throw new Exception(ErrorMessage1);
 
-                result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
-            }
+                                                                       return Core.Result.Result.OkAsync();
+                                                                   },
+                                                                   () => ErrorMessage2.ToResultError());
 
-            [Fact]
-            public async Task Success()
-            {
-                var result = await Core.Result.Result.TryAsync(() => Core.Result.Result.OkAsync(),
-                                                               () => ErrorMessage2);
+                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                }
 
-                result.ShouldBeSuccess();
+                [Fact]
+                public async Task Failure()
+                {
+                    var result = await Core.Result.Result.TryAsync(() => Core.Result.Result.FailAsync(ErrorMessage1),
+                                                                   () => ErrorMessage2.ToResultError());
+
+                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                }
+
+                [Fact]
+                public async Task Success()
+                {
+                    var result = await Core.Result.Result.TryAsync(() => Core.Result.Result.OkAsync(),
+                                                                   () => ErrorMessage2.ToResultError());
+
+                    result.ShouldBeSuccess();
+                }
             }
         }
 
         public class PayloadResultReturn
         {
-            [Fact]
-            public async Task Exception()
+            public class ErrorMessage
             {
-                var value = 1;
+                [Fact]
+                public async Task Exception()
+                {
+                    var value = 1;
 
-                var result = await Core.Result.Result.TryAsync(() =>
-                                                               {
-                                                                   throw new Exception(ErrorMessage1);
+                    var result = await Core.Result.Result.TryAsync(() =>
+                                                                   {
+                                                                       throw new Exception(ErrorMessage1);
 
-                                                                   return Core.Result.Result.OkAsync(value);
-                                                               },
-                                                               () => ErrorMessage2);
+                                                                       return Core.Result.Result.OkAsync(value);
+                                                                   },
+                                                                   () => ErrorMessage2);
 
-                result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                }
+
+                [Fact]
+                public async Task Failure()
+                {
+                    var result = await Core.Result.Result.TryAsync(() => Core.Result.Result.FailAsync<int>(ErrorMessage1),
+                                                                   () => ErrorMessage2);
+
+                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                }
+
+                [Fact]
+                public async Task Success()
+                {
+                    var value = 1;
+
+                    var result = await Core.Result.Result.TryAsync(() => Core.Result.Result.OkAsync(value),
+                                                                   () => ErrorMessage2);
+
+                    result.ShouldBeSuccessWithValue(value);
+                }
             }
 
-            [Fact]
-            public async Task Failure()
+            public class IResultError
             {
-                var result = await Core.Result.Result.TryAsync(() => Core.Result.Result.FailAsync<int>(ErrorMessage1),
-                                                               () => ErrorMessage2);
+                [Fact]
+                public async Task Exception()
+                {
+                    var value = 1;
 
-                result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
-            }
+                    var result = await Core.Result.Result.TryAsync(() =>
+                                                                   {
+                                                                       throw new Exception(ErrorMessage1);
 
-            [Fact]
-            public async Task Success()
-            {
-                var value = 1;
+                                                                       return Core.Result.Result.OkAsync(value);
+                                                                   },
+                                                                   () => ErrorMessage2.ToResultError());
 
-                var result = await Core.Result.Result.TryAsync(() => Core.Result.Result.OkAsync(value),
-                                                               () => ErrorMessage2);
+                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                }
 
-                result.ShouldBeSuccessWithValue(value);
+                [Fact]
+                public async Task Failure()
+                {
+                    var result = await Core.Result.Result.TryAsync(() => Core.Result.Result.FailAsync<int>(ErrorMessage1),
+                                                                   () => ErrorMessage2.ToResultError());
+
+                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                }
+
+                [Fact]
+                public async Task Success()
+                {
+                    var value = 1;
+
+                    var result = await Core.Result.Result.TryAsync(() => Core.Result.Result.OkAsync(value),
+                                                                   () => ErrorMessage2.ToResultError());
+
+                    result.ShouldBeSuccessWithValue(value);
+                }
             }
         }
     }
