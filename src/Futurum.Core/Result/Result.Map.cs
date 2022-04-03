@@ -1,6 +1,4 @@
-﻿using Futurum.Core.Functional;
-
-namespace Futurum.Core.Result;
+﻿namespace Futurum.Core.Result;
 
 public readonly partial struct Result
 {
@@ -91,11 +89,11 @@ public static partial class ResultExtensions
     ///     </item>
     /// </list>
     /// </summary>
-    public static Task<Result<TR>> MapAsync<T, TR>(this Task<Result<T>> resultTask, Func<T, Task<TR>> func)
+    public static async Task<Result<TR>> MapAsync<T, TR>(this Task<Result<T>> resultTask, Func<T, Task<TR>> func)
     {
-        Task<Result<TR>> Execute(Result<T> result) => result.MapAsync(func);
+        var result = await resultTask;
 
-        return resultTask.PipeAsync(Execute);
+        return result.IsFailure ? Result.Fail<TR>(result.Error.Value) : (await func(result.Value.Value)).ToResultOk();
     }
 
     /// <summary>
@@ -109,11 +107,11 @@ public static partial class ResultExtensions
     ///     </item>
     /// </list>
     /// </summary>
-    public static Task<Result<T>> MapAsync<T>(this Task<Result> resultTask, Func<Task<T>> func)
+    public static async Task<Result<T>> MapAsync<T>(this Task<Result> resultTask, Func<Task<T>> func)
     {
-        Task<Result<T>> Execute(Result result) => result.MapAsync(func);
+        var result = await resultTask;
 
-        return resultTask.PipeAsync(Execute);
+        return result.IsFailure ? Result.Fail<T>(result.Error.Value) : (await func()).ToResultOk();
     }
 
     /// <summary>
@@ -163,17 +161,17 @@ public static partial class ResultExtensions
     ///     </item>
     /// </list>
     /// </summary>
-    public static Task<Result<T>> MapAsync<T>(this Task<Result> resultTask, Func<T> func)
+    public static async Task<Result<T>> MapAsync<T>(this Task<Result> resultTask, Func<T> func)
     {
-        Result<T> Execute(Result result) => result.Map(func);
+        var value = await resultTask;
 
-        return resultTask.PipeAsync(Execute);
+        return value.IsFailure ? Result.Fail<T>(value.Error.Value) : func().ToResultOk();
     }
 
-    public static Task<Result<TR2>> MapAsync<T, TR1, TR2>(this Task<Result<T>> resultTask, Func<T, TR1> selectorFunc, Func<TR1, TR2> func)
+    public static async Task<Result<TR2>> MapAsync<T, TR1, TR2>(this Task<Result<T>> resultTask, Func<T, TR1> selectorFunc, Func<TR1, TR2> func)
     {
-        Result<TR2> Execute(Result<T> result) => result.Map(selectorFunc).Map(func);
+        var value = await resultTask;
 
-        return resultTask.PipeAsync(Execute);
+        return value.IsFailure ? Result.Fail<TR2>(value.Error.Value) : func(selectorFunc(value.Value.Value)).ToResultOk();
     }
 }

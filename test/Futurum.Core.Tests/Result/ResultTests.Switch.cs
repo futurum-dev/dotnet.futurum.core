@@ -14,388 +14,563 @@ public class ResultSwitchTests
 {
     private const string ErrorMessage = "ERROR_MESSAGE_1";
 
-    public class Sync
+    public class SyncInput
     {
-        public class NonGeneric
+        public class SyncOutput
         {
-            public class WithoutErrorPayloadOnFailure
+            public class NonGeneric
             {
-                [Fact]
-                public void FailureInput_Matches()
+                public class WithoutErrorPayloadOnFailure
                 {
-                    var trueValue = Guid.NewGuid();
-                    var falseValue = Guid.NewGuid();
+                    [Fact]
+                    public void FailureInput_Matches()
+                    {
+                        var trueValue = Guid.NewGuid();
+                        var falseValue = Guid.NewGuid();
 
-                    var resultInput = Core.Result.Result.Fail(ErrorMessage);
+                        var resultInput = Core.Result.Result.Fail(ErrorMessage);
 
-                    var returnValue = resultInput.Switch(() => trueValue,
-                                                         () => falseValue);
+                        var returnValue = resultInput.Switch(() => trueValue,
+                                                             () => falseValue);
 
-                    returnValue.Should().Be(falseValue);
+                        returnValue.Should().Be(falseValue);
+                    }
+
+                    [Fact]
+                    public void SuccessInput()
+                    {
+                        var trueValue = Guid.NewGuid();
+                        var falseValue = Guid.NewGuid();
+
+                        var resultInput = Core.Result.Result.Ok();
+
+                        var returnValue = resultInput.Switch(() => trueValue,
+                                                             () => falseValue);
+
+                        returnValue.Should().Be(trueValue);
+                    }
                 }
 
-                [Fact]
-                public void SuccessInput()
+                public class WithErrorPayloadOnFailure
                 {
-                    var trueValue = Guid.NewGuid();
-                    var falseValue = Guid.NewGuid();
+                    [Fact]
+                    public void FailureInput_Matches()
+                    {
+                        var trueValue = Guid.NewGuid();
+                        var falseValue = Guid.NewGuid();
 
-                    var resultInput = Core.Result.Result.Ok();
+                        IResultError passedError = null;
 
-                    var returnValue = resultInput.Switch(() => trueValue,
-                                                         () => falseValue);
+                        var resultInput = Core.Result.Result.Fail(ErrorMessage);
 
-                    returnValue.Should().Be(trueValue);
+                        var returnValue = resultInput.Switch(() => trueValue,
+                                                             error =>
+                                                             {
+                                                                 passedError = error;
+
+                                                                 return falseValue;
+                                                             });
+
+                        returnValue.Should().Be(falseValue);
+                        passedError.ShouldBeError(ErrorMessage);
+                    }
+
+                    [Fact]
+                    public void SuccessInput()
+                    {
+                        var trueValue = Guid.NewGuid();
+                        var falseValue = Guid.NewGuid();
+
+                        var resultInput = Core.Result.Result.Ok();
+
+                        var returnValue = resultInput.Switch(() => trueValue,
+                                                             _ => falseValue);
+
+                        returnValue.Should().Be(trueValue);
+                    }
                 }
             }
 
-            public class WithErrorPayloadOnFailure
+            public class Generic
             {
-                [Fact]
-                public void FailureInput_Matches()
+                public class WithoutErrorPayloadOnFailure
                 {
-                    var trueValue = Guid.NewGuid();
-                    var falseValue = Guid.NewGuid();
+                    [Fact]
+                    public void FailureInput_Matches()
+                    {
+                        var trueValue = Guid.NewGuid();
+                        var falseValue = Guid.NewGuid();
 
-                    IResultError passedError = null;
+                        var resultInput = Core.Result.Result.Fail<Guid>(ErrorMessage);
 
-                    var resultInput = Core.Result.Result.Fail(ErrorMessage);
+                        var returnValue = resultInput.Switch(value => trueValue,
+                                                             () => falseValue);
 
-                    var returnValue = resultInput.Switch(() => trueValue,
-                                                         error =>
-                                                         {
-                                                             passedError = error;
+                        returnValue.Should().Be(falseValue);
+                    }
 
-                                                             return falseValue;
-                                                         });
+                    [Fact]
+                    public void SuccessInput()
+                    {
+                        var inputValue = Guid.NewGuid();
 
-                    returnValue.Should().Be(falseValue);
-                    passedError.ShouldBeError(ErrorMessage);
+                        var trueValue = Guid.NewGuid();
+                        var falseValue = Guid.NewGuid();
+
+                        var passedValue = Guid.Empty;
+
+                        var resultInput = Core.Result.Result.Ok(inputValue);
+
+                        var returnValue = resultInput.Switch(value =>
+                                                             {
+                                                                 passedValue = value;
+
+                                                                 return trueValue;
+                                                             },
+                                                             () => falseValue);
+
+                        passedValue.Should().Be(inputValue);
+                        returnValue.Should().Be(trueValue);
+                    }
                 }
 
-                [Fact]
-                public void SuccessInput()
+                public class WithErrorPayloadOnFailure
                 {
-                    var trueValue = Guid.NewGuid();
-                    var falseValue = Guid.NewGuid();
+                    [Fact]
+                    public void FailureInput_Matches()
+                    {
+                        var trueValue = Guid.NewGuid();
+                        var falseValue = Guid.NewGuid();
 
-                    var resultInput = Core.Result.Result.Ok();
+                        IResultError passedError = null;
 
-                    var returnValue = resultInput.Switch(() => trueValue,
-                                                         _ => falseValue);
+                        var resultInput = Core.Result.Result.Fail<Guid>(ErrorMessage);
 
-                    returnValue.Should().Be(trueValue);
+                        var returnValue = resultInput.Switch(value => trueValue,
+                                                             error =>
+                                                             {
+                                                                 passedError = error;
+
+                                                                 return falseValue;
+                                                             });
+
+                        returnValue.Should().Be(falseValue);
+                        passedError.ShouldBeError(ErrorMessage);
+                    }
+
+                    [Fact]
+                    public void SuccessInput()
+                    {
+                        var inputValue = Guid.NewGuid();
+
+                        var trueValue = Guid.NewGuid();
+                        var falseValue = Guid.NewGuid();
+
+                        var passedValue = Guid.Empty;
+
+                        var resultInput = Core.Result.Result.Ok(inputValue);
+
+                        var returnValue = resultInput.Switch(value =>
+                                                             {
+                                                                 passedValue = value;
+
+                                                                 return trueValue;
+                                                             },
+                                                             _ => falseValue);
+
+                        passedValue.Should().Be(inputValue);
+                        returnValue.Should().Be(trueValue);
+                    }
                 }
             }
         }
 
-        public class Generic
+        public class AsyncOutput
         {
-            public class WithoutErrorPayloadOnFailure
+            public class NonGeneric
             {
-                [Fact]
-                public void FailureInput_Matches()
+                public class WithoutErrorPayloadOnFailure
                 {
-                    var trueValue = Guid.NewGuid();
-                    var falseValue = Guid.NewGuid();
+                    [Fact]
+                    public async Task FailureInput_Matches()
+                    {
+                        var trueValue = Guid.NewGuid();
+                        var falseValue = Guid.NewGuid();
 
-                    var resultInput = Core.Result.Result.Fail<Guid>(ErrorMessage);
+                        var resultInput = Core.Result.Result.Fail(ErrorMessage);
 
-                    var returnValue = resultInput.Switch(value => trueValue,
-                                                         () => falseValue);
+                        var returnValue = await resultInput.SwitchAsync(() => Task.FromResult(trueValue),
+                                                                        () => Task.FromResult(falseValue));
 
-                    returnValue.Should().Be(falseValue);
+                        returnValue.Should().Be(falseValue);
+                    }
+
+                    [Fact]
+                    public async Task SuccessInput()
+                    {
+                        var trueValue = Guid.NewGuid();
+                        var falseValue = Guid.NewGuid();
+
+                        var resultInput = Core.Result.Result.Ok();
+
+                        var returnValue = await resultInput.SwitchAsync(() => Task.FromResult(trueValue),
+                                                                        () => Task.FromResult(falseValue));
+
+                        returnValue.Should().Be(trueValue);
+                    }
                 }
 
-                [Fact]
-                public void SuccessInput()
+                public class WithErrorPayloadOnFailure
                 {
-                    var inputValue = Guid.NewGuid();
+                    [Fact]
+                    public async Task FailureInput_Matches()
+                    {
+                        var trueValue = Guid.NewGuid();
+                        var falseValue = Guid.NewGuid();
 
-                    var trueValue = Guid.NewGuid();
-                    var falseValue = Guid.NewGuid();
+                        IResultError passedError = null;
 
-                    var passedValue = Guid.Empty;
+                        var resultInput = Core.Result.Result.Fail(ErrorMessage);
 
-                    var resultInput = Core.Result.Result.Ok(inputValue);
+                        var returnValue = await resultInput.SwitchAsync(() => Task.FromResult(trueValue),
+                                                                        error =>
+                                                                        {
+                                                                            passedError = error;
 
-                    var returnValue = resultInput.Switch(value =>
-                                                         {
-                                                             passedValue = value;
+                                                                            return Task.FromResult(falseValue);
+                                                                        });
 
-                                                             return trueValue;
-                                                         },
-                                                         () => falseValue);
+                        returnValue.Should().Be(falseValue);
+                        passedError.ShouldBeError(ErrorMessage);
+                    }
 
-                    passedValue.Should().Be(inputValue);
-                    returnValue.Should().Be(trueValue);
+                    [Fact]
+                    public void SuccessInput()
+                    {
+                        var trueValue = Guid.NewGuid();
+                        var falseValue = Guid.NewGuid();
+
+                        var resultInput = Core.Result.Result.Ok();
+
+                        var returnValue = resultInput.Switch(() => trueValue,
+                                                             _ => falseValue);
+
+                        returnValue.Should().Be(trueValue);
+                    }
                 }
             }
 
-            public class WithErrorPayloadOnFailure
+            public class Generic
             {
-                [Fact]
-                public void FailureInput_Matches()
+                public class WithoutErrorPayloadOnFailure
                 {
-                    var trueValue = Guid.NewGuid();
-                    var falseValue = Guid.NewGuid();
+                    [Fact]
+                    public async Task FailureInput_Matches()
+                    {
+                        var trueValue = Guid.NewGuid();
+                        var falseValue = Guid.NewGuid();
 
-                    IResultError passedError = null;
+                        var resultInput = Core.Result.Result.Fail<Guid>(ErrorMessage);
 
-                    var resultInput = Core.Result.Result.Fail<Guid>(ErrorMessage);
+                        var returnValue = await resultInput.SwitchAsync(value => Task.FromResult(trueValue),
+                                                                        () => Task.FromResult(falseValue));
 
-                    var returnValue = resultInput.Switch(value => trueValue,
-                                                         error =>
-                                                         {
-                                                             passedError = error;
+                        returnValue.Should().Be(falseValue);
+                    }
 
-                                                             return falseValue;
-                                                         });
+                    [Fact]
+                    public async Task SuccessInput()
+                    {
+                        var inputValue = Guid.NewGuid();
 
-                    returnValue.Should().Be(falseValue);
-                    passedError.ShouldBeError(ErrorMessage);
+                        var trueValue = Guid.NewGuid();
+                        var falseValue = Guid.NewGuid();
+
+                        var passedValue = Guid.Empty;
+
+                        var resultInput = Core.Result.Result.Ok(inputValue);
+
+                        var returnValue = await resultInput.SwitchAsync(value =>
+                                                                        {
+                                                                            passedValue = value;
+
+                                                                            return Task.FromResult(trueValue);
+                                                                        },
+                                                                        () => Task.FromResult(falseValue));
+
+                        passedValue.Should().Be(inputValue);
+                        returnValue.Should().Be(trueValue);
+                    }
                 }
 
-                [Fact]
-                public void SuccessInput()
+                public class WithErrorPayloadOnFailure
                 {
-                    var inputValue = Guid.NewGuid();
+                    [Fact]
+                    public async Task FailureInput_Matches()
+                    {
+                        var trueValue = Guid.NewGuid();
+                        var falseValue = Guid.NewGuid();
 
-                    var trueValue = Guid.NewGuid();
-                    var falseValue = Guid.NewGuid();
+                        IResultError passedError = null;
 
-                    var passedValue = Guid.Empty;
+                        var resultInput = Core.Result.Result.Fail<Guid>(ErrorMessage);
 
-                    var resultInput = Core.Result.Result.Ok(inputValue);
+                        var returnValue = await resultInput.SwitchAsync(value => Task.FromResult(trueValue),
+                                                                        error =>
+                                                                        {
+                                                                            passedError = error;
 
-                    var returnValue = resultInput.Switch(value =>
-                                                         {
-                                                             passedValue = value;
+                                                                            return Task.FromResult(falseValue);
+                                                                        });
 
-                                                             return trueValue;
-                                                         },
-                                                         _ => falseValue);
+                        returnValue.Should().Be(falseValue);
+                        passedError.ShouldBeError(ErrorMessage);
+                    }
 
-                    passedValue.Should().Be(inputValue);
-                    returnValue.Should().Be(trueValue);
+                    [Fact]
+                    public async Task SuccessInput()
+                    {
+                        var inputValue = Guid.NewGuid();
+
+                        var trueValue = Guid.NewGuid();
+                        var falseValue = Guid.NewGuid();
+
+                        var passedValue = Guid.Empty;
+
+                        var resultInput = Core.Result.Result.Ok(inputValue);
+
+                        var returnValue = await resultInput.SwitchAsync(value =>
+                                                                        {
+                                                                            passedValue = value;
+
+                                                                            return Task.FromResult(trueValue);
+                                                                        },
+                                                                        _ => Task.FromResult(falseValue));
+
+                        passedValue.Should().Be(inputValue);
+                        returnValue.Should().Be(trueValue);
+                    }
                 }
             }
         }
     }
 
-    public class Async
+    public class AsyncInput
     {
-        public class NonGeneric
+        public class SyncOutput
         {
-            public class WithoutErrorPayloadOnFailure
+            public class NonGeneric
             {
-                [Fact]
-                public async Task FailureInput_Matches()
+                public class WithoutErrorPayloadOnFailure
                 {
-                    var trueValue = Guid.NewGuid();
-                    var falseValue = Guid.NewGuid();
+                    [Fact]
+                    public async Task FailureInput_Matches()
+                    {
+                        var trueValue = Guid.NewGuid();
+                        var falseValue = Guid.NewGuid();
 
-                    var resultInput = Core.Result.Result.FailAsync(ErrorMessage);
+                        var resultInput = Core.Result.Result.FailAsync(ErrorMessage);
 
-                    var returnValue = await resultInput.SwitchAsync(() => trueValue,
-                                                                    () => falseValue);
+                        var returnValue = await resultInput.SwitchAsync(() => trueValue,
+                                                                        () => falseValue);
 
-                    returnValue.Should().Be(falseValue);
+                        returnValue.Should().Be(falseValue);
+                    }
+
+                    [Fact]
+                    public async Task SuccessInput()
+                    {
+                        var trueValue = Guid.NewGuid();
+                        var falseValue = Guid.NewGuid();
+
+                        var resultInput = Core.Result.Result.OkAsync();
+
+                        var returnValue = await resultInput.SwitchAsync(() => trueValue,
+                                                                        () => falseValue);
+
+                        returnValue.Should().Be(trueValue);
+                    }
                 }
 
-                [Fact]
-                public async Task SuccessInput()
+                public class WithErrorPayloadOnFailure
                 {
-                    var trueValue = Guid.NewGuid();
-                    var falseValue = Guid.NewGuid();
+                    [Fact]
+                    public async Task FailureInput_Matches()
+                    {
+                        var trueValue = Guid.NewGuid();
+                        var falseValue = Guid.NewGuid();
 
-                    var resultInput = Core.Result.Result.OkAsync();
+                        IResultError passedError = null;
 
-                    var returnValue = await resultInput.SwitchAsync(() => trueValue,
-                                                                    () => falseValue);
+                        var resultInput = Core.Result.Result.FailAsync(ErrorMessage);
 
-                    returnValue.Should().Be(trueValue);
+                        var returnValue = await resultInput.SwitchAsync(() => trueValue,
+                                                                        error =>
+                                                                        {
+                                                                            passedError = error;
+
+                                                                            return falseValue;
+                                                                        });
+
+                        returnValue.Should().Be(falseValue);
+                        passedError.ShouldBeError(ErrorMessage);
+                    }
+
+                    [Fact]
+                    public async Task SuccessInput()
+                    {
+                        var trueValue = Guid.NewGuid();
+                        var falseValue = Guid.NewGuid();
+
+                        var resultInput = Core.Result.Result.OkAsync();
+
+                        var returnValue = await resultInput.SwitchAsync(() => trueValue,
+                                                                        _ => falseValue);
+
+                        returnValue.Should().Be(trueValue);
+                    }
                 }
             }
 
-            public class WithErrorPayloadOnFailure
+            public class Generic
             {
-                [Fact]
-                public async Task FailureInput_Matches()
+                public class WithoutErrorPayloadOnFailure
                 {
-                    var trueValue = Guid.NewGuid();
-                    var falseValue = Guid.NewGuid();
+                    [Fact]
+                    public async Task FailureInput_Matches()
+                    {
+                        var trueValue = Guid.NewGuid();
+                        var falseValue = Guid.NewGuid();
 
-                    IResultError passedError = null;
+                        var resultInput = Core.Result.Result.FailAsync<Guid>(ErrorMessage);
 
-                    var resultInput = Core.Result.Result.FailAsync(ErrorMessage);
+                        var returnValue = await resultInput.SwitchAsync(value => trueValue,
+                                                                        () => falseValue);
 
-                    var returnValue = await resultInput.SwitchAsync(() => trueValue,
-                                                                    error =>
-                                                                    {
-                                                                        passedError = error;
+                        returnValue.Should().Be(falseValue);
+                    }
 
-                                                                        return falseValue;
-                                                                    });
+                    [Fact]
+                    public async Task SuccessInput()
+                    {
+                        var inputValue = Guid.NewGuid();
 
-                    returnValue.Should().Be(falseValue);
-                    passedError.ShouldBeError(ErrorMessage);
+                        var trueValue = Guid.NewGuid();
+                        var falseValue = Guid.NewGuid();
+
+                        var passedValue = Guid.Empty;
+
+                        var resultInput = Core.Result.Result.OkAsync(inputValue);
+
+                        var returnValue = await resultInput.SwitchAsync(value =>
+                                                                        {
+                                                                            passedValue = value;
+
+                                                                            return trueValue;
+                                                                        },
+                                                                        () => falseValue);
+
+                        passedValue.Should().Be(inputValue);
+                        returnValue.Should().Be(trueValue);
+                    }
                 }
 
-                [Fact]
-                public async Task SuccessInput()
+                public class WithErrorPayloadOnFailure
                 {
-                    var trueValue = Guid.NewGuid();
-                    var falseValue = Guid.NewGuid();
+                    [Fact]
+                    public async Task FailureInput_Matches()
+                    {
+                        var trueValue = Guid.NewGuid();
+                        var falseValue = Guid.NewGuid();
 
-                    var resultInput = Core.Result.Result.OkAsync();
+                        IResultError passedError = null;
 
-                    var returnValue = await resultInput.SwitchAsync(() => trueValue,
-                                                                    _ => falseValue);
+                        var resultInput = Core.Result.Result.FailAsync<Guid>(ErrorMessage);
 
-                    returnValue.Should().Be(trueValue);
-                }
-            }
-        }
+                        var returnValue = await resultInput.SwitchAsync(value => trueValue,
+                                                                        error =>
+                                                                        {
+                                                                            passedError = error;
 
-        public class Generic
-        {
-            public class WithoutErrorPayloadOnFailure
-            {
-                [Fact]
-                public async Task FailureInput_Matches()
-                {
-                    var trueValue = Guid.NewGuid();
-                    var falseValue = Guid.NewGuid();
+                                                                            return falseValue;
+                                                                        });
 
-                    var resultInput = Core.Result.Result.FailAsync<Guid>(ErrorMessage);
+                        returnValue.Should().Be(falseValue);
+                        passedError.ShouldBeError(ErrorMessage);
+                    }
 
-                    var returnValue = await resultInput.SwitchAsync(value => trueValue,
-                                                                    () => falseValue);
+                    [Fact]
+                    public async Task SuccessInput()
+                    {
+                        var inputValue = Guid.NewGuid();
 
-                    returnValue.Should().Be(falseValue);
-                }
+                        var trueValue = Guid.NewGuid();
+                        var falseValue = Guid.NewGuid();
 
-                [Fact]
-                public async Task SuccessInput()
-                {
-                    var inputValue = Guid.NewGuid();
+                        var passedValue = Guid.Empty;
 
-                    var trueValue = Guid.NewGuid();
-                    var falseValue = Guid.NewGuid();
+                        var resultInput = Core.Result.Result.OkAsync(inputValue);
 
-                    var passedValue = Guid.Empty;
+                        var returnValue = await resultInput.SwitchAsync(value =>
+                                                                        {
+                                                                            passedValue = value;
 
-                    var resultInput = Core.Result.Result.OkAsync(inputValue);
+                                                                            return trueValue;
+                                                                        },
+                                                                        _ => falseValue);
 
-                    var returnValue = await resultInput.SwitchAsync(value =>
-                                                                    {
-                                                                        passedValue = value;
-
-                                                                        return trueValue;
-                                                                    },
-                                                                    () => falseValue);
-
-                    passedValue.Should().Be(inputValue);
-                    returnValue.Should().Be(trueValue);
-                }
-            }
-
-            public class WithErrorPayloadOnFailure
-            {
-                [Fact]
-                public async Task FailureInput_Matches()
-                {
-                    var trueValue = Guid.NewGuid();
-                    var falseValue = Guid.NewGuid();
-
-                    IResultError passedError = null;
-
-                    var resultInput = Core.Result.Result.FailAsync<Guid>(ErrorMessage);
-
-                    var returnValue = await resultInput.SwitchAsync(value => trueValue,
-                                                                    error =>
-                                                                    {
-                                                                        passedError = error;
-
-                                                                        return falseValue;
-                                                                    });
-
-                    returnValue.Should().Be(falseValue);
-                    passedError.ShouldBeError(ErrorMessage);
+                        passedValue.Should().Be(inputValue);
+                        returnValue.Should().Be(trueValue);
+                    }
                 }
 
-                [Fact]
-                public async Task SuccessInput()
+                public class WithAsyncFuncWithErrorPayloadOnFailure
                 {
-                    var inputValue = Guid.NewGuid();
+                    [Fact]
+                    public async Task FailureInput_Matches()
+                    {
+                        var trueValue = Guid.NewGuid();
+                        var falseValue = Guid.NewGuid();
 
-                    var trueValue = Guid.NewGuid();
-                    var falseValue = Guid.NewGuid();
+                        IResultError passedError = null;
 
-                    var passedValue = Guid.Empty;
+                        var resultInput = Core.Result.Result.FailAsync<Guid>(ErrorMessage);
 
-                    var resultInput = Core.Result.Result.OkAsync(inputValue);
+                        var returnValue = await resultInput.SwitchAsync(value => Task.FromResult(trueValue),
+                                                                        error =>
+                                                                        {
+                                                                            passedError = error;
 
-                    var returnValue = await resultInput.SwitchAsync(value =>
-                                                                    {
-                                                                        passedValue = value;
+                                                                            return Task.FromResult(falseValue);
+                                                                        });
 
-                                                                        return trueValue;
-                                                                    },
-                                                                    _ => falseValue);
+                        returnValue.Should().Be(falseValue);
+                        passedError.ShouldBeError(ErrorMessage);
+                    }
 
-                    passedValue.Should().Be(inputValue);
-                    returnValue.Should().Be(trueValue);
-                }
-            }
+                    [Fact]
+                    public async Task SuccessInput()
+                    {
+                        var inputValue = Guid.NewGuid();
 
-            public class WithAsyncFuncWithErrorPayloadOnFailure
-            {
-                [Fact]
-                public async Task FailureInput_Matches()
-                {
-                    var trueValue = Guid.NewGuid();
-                    var falseValue = Guid.NewGuid();
+                        var trueValue = Guid.NewGuid();
+                        var falseValue = Guid.NewGuid();
 
-                    IResultError passedError = null;
+                        var passedValue = Guid.Empty;
 
-                    var resultInput = Core.Result.Result.FailAsync<Guid>(ErrorMessage);
+                        var resultInput = Core.Result.Result.OkAsync(inputValue);
 
-                    var returnValue = await resultInput.SwitchAsync(value => Task.FromResult(trueValue),
-                                                                    error =>
-                                                                    {
-                                                                        passedError = error;
+                        var returnValue = await resultInput.SwitchAsync(value =>
+                                                                        {
+                                                                            passedValue = value;
 
-                                                                        return Task.FromResult(falseValue);
-                                                                    });
+                                                                            return Task.FromResult(trueValue);
+                                                                        },
+                                                                        _ => Task.FromResult(falseValue));
 
-                    returnValue.Should().Be(falseValue);
-                    passedError.ShouldBeError(ErrorMessage);
-                }
-
-                [Fact]
-                public async Task SuccessInput()
-                {
-                    var inputValue = Guid.NewGuid();
-
-                    var trueValue = Guid.NewGuid();
-                    var falseValue = Guid.NewGuid();
-
-                    var passedValue = Guid.Empty;
-
-                    var resultInput = Core.Result.Result.OkAsync(inputValue);
-
-                    var returnValue = await resultInput.SwitchAsync(value =>
-                                                                    {
-                                                                        passedValue = value;
-
-                                                                        return Task.FromResult(trueValue);
-                                                                    },
-                                                                    _ => Task.FromResult(falseValue));
-
-                    passedValue.Should().Be(inputValue);
-                    returnValue.Should().Be(trueValue);
+                        passedValue.Should().Be(inputValue);
+                        returnValue.Should().Be(trueValue);
+                    }
                 }
             }
         }

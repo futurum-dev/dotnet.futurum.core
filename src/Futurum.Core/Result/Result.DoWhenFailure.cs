@@ -1,6 +1,4 @@
-﻿using Futurum.Core.Functional;
-
-namespace Futurum.Core.Result;
+﻿namespace Futurum.Core.Result;
 
 public readonly partial struct Result
 {
@@ -17,8 +15,13 @@ public readonly partial struct Result
     /// <para></para>
     /// The original <see cref="Result" /> is returned unchanged.
     /// </summary>
-    public Result DoWhenFailure(Action sideEffect) =>
-        DoSwitch(Function.DoNothing, sideEffect);
+    public Result DoWhenFailure(Action sideEffect)
+    {
+        if (!IsSuccess)
+            sideEffect();
+
+        return this;
+    }
 
     /// <summary>
     /// Execute a side-effect on a failed <see cref="Result" />.
@@ -33,8 +36,13 @@ public readonly partial struct Result
     /// <para></para>
     /// The original <see cref="Result" /> is returned unchanged.
     /// </summary>
-    public Result DoWhenFailure(Action<IResultError> sideEffect) =>
-        DoSwitch(Function.DoNothing, sideEffect);
+    public Result DoWhenFailure(Action<IResultError> sideEffect)
+    {
+        if (!IsSuccess)
+            sideEffect(Error.Value);
+
+        return this;
+    }
 
     /// <summary>
     /// Execute a side-effect on a failed <see cref="Result" />.
@@ -49,8 +57,13 @@ public readonly partial struct Result
     /// <para></para>
     /// The original <see cref="Result" /> is returned unchanged.
     /// </summary>
-    public Task<Result> DoWhenFailureAsync(Func<Task> sideEffect) =>
-        DoSwitchAsync(Function.DoNothingAsync, sideEffect);
+    public async Task<Result> DoWhenFailureAsync(Func<Task> sideEffect)
+    {
+        if (!IsSuccess)
+            await sideEffect();
+
+        return this;
+    }
 
     /// <summary>
     /// Execute a side-effect on a failed <see cref="Result" />.
@@ -65,8 +78,13 @@ public readonly partial struct Result
     /// <para></para>
     /// The original <see cref="Result" /> is returned unchanged.
     /// </summary>
-    public Task<Result> DoWhenFailureAsync(Func<IResultError, Task> sideEffect) =>
-        DoSwitchAsync(Function.DoNothingAsync, sideEffect);
+    public async Task<Result> DoWhenFailureAsync(Func<IResultError, Task> sideEffect)
+    {
+        if (!IsSuccess)
+            await sideEffect(Error.Value);
+
+        return this;
+    }
 }
 
 public readonly partial struct Result<T>
@@ -84,8 +102,13 @@ public readonly partial struct Result<T>
     /// <para></para>
     /// The original <see cref="Result{T}" /> is returned unchanged.
     /// </summary>
-    public Result<T> DoWhenFailure(Action sideEffect) =>
-        DoSwitch(Function<T>.DoNothing, sideEffect);
+    public Result<T> DoWhenFailure(Action sideEffect)
+    {
+        if (!IsSuccess)
+            sideEffect();
+
+        return this;
+    }
 
     /// <summary>
     /// Execute a side-effect on a failed <see cref="Result{T}" />.
@@ -100,8 +123,13 @@ public readonly partial struct Result<T>
     /// <para></para>
     /// The original <see cref="Result{T}" /> is returned unchanged.
     /// </summary>
-    public Result<T> DoWhenFailure(Action<IResultError> sideEffect) =>
-        DoSwitch(Function<T>.DoNothing, sideEffect);
+    public Result<T> DoWhenFailure(Action<IResultError> sideEffect)
+    {
+        if (!IsSuccess)
+            sideEffect(Error.Value);
+
+        return this;
+    }
 
     /// <summary>
     /// Execute a side-effect on a failed <see cref="Result{T}" />.
@@ -116,8 +144,13 @@ public readonly partial struct Result<T>
     /// <para></para>
     /// The original <see cref="Result{T}" /> is returned unchanged.
     /// </summary>
-    public Task<Result<T>> DoWhenFailureAsync(Func<Task> sideEffect) =>
-        DoSwitchAsync(Function<T>.DoNothingAsync, sideEffect);
+    public async Task<Result<T>> DoWhenFailureAsync(Func<Task> sideEffect)
+    {
+        if (!IsSuccess)
+            await sideEffect();
+
+        return this;
+    }
 
     /// <summary>
     /// Execute a side-effect on a failed <see cref="Result{T}" />.
@@ -132,8 +165,13 @@ public readonly partial struct Result<T>
     /// <para></para>
     /// The original <see cref="Result{T}" /> is returned unchanged.
     /// </summary>
-    public Task<Result<T>> DoWhenFailureAsync(Func<IResultError, Task> sideEffect) =>
-        DoSwitchAsync(Function<T>.DoNothingAsync, sideEffect);
+    public async Task<Result<T>> DoWhenFailureAsync(Func<IResultError, Task> sideEffect)
+    {
+        if (!IsSuccess)
+            await sideEffect(Error.Value);
+
+        return this;
+    }
 }
 
 public static partial class ResultExtensions
@@ -151,11 +189,14 @@ public static partial class ResultExtensions
     /// <para></para>
     /// The original <see cref="Result{T}" /> is returned unchanged.
     /// </summary>
-    public static Task<Result<T>> DoWhenFailureAsync<T>(this Task<Result<T>> resultTask, Func<Task> sideEffect)
+    public static async Task<Result<T>> DoWhenFailureAsync<T>(this Task<Result<T>> resultTask, Func<Task> sideEffect)
     {
-        Task<Result<T>> Execute(Result<T> result) => result.DoWhenFailureAsync(sideEffect);
+        var result = await resultTask;
 
-        return resultTask.PipeAsync(Execute);
+        if (!result.IsSuccess)
+            await sideEffect();
+
+        return result;
     }
 
     /// <summary>
@@ -171,11 +212,14 @@ public static partial class ResultExtensions
     /// <para></para>
     /// The original <see cref="Result" /> is returned unchanged.
     /// </summary>
-    public static Task<Result> DoWhenFailureAsync(this Task<Result> resultTask, Func<Task> sideEffect)
+    public static async Task<Result> DoWhenFailureAsync(this Task<Result> resultTask, Func<Task> sideEffect)
     {
-        Task<Result> Execute(Result result) => result.DoWhenFailureAsync(sideEffect);
+        var result = await resultTask;
 
-        return resultTask.PipeAsync(Execute);
+        if (!result.IsSuccess)
+            await sideEffect();
+        
+        return result;
     }
 
     /// <summary>
@@ -191,11 +235,14 @@ public static partial class ResultExtensions
     /// <para></para>
     /// The original <see cref="Result{T}" /> is returned unchanged.
     /// </summary>
-    public static Task<Result<T>> DoWhenFailureAsync<T>(this Task<Result<T>> resultTask, Func<IResultError, Task> sideEffect)
+    public static async Task<Result<T>> DoWhenFailureAsync<T>(this Task<Result<T>> resultTask, Func<IResultError, Task> sideEffect)
     {
-        Task<Result<T>> Execute(Result<T> result) => result.DoWhenFailureAsync(sideEffect);
+        var result = await resultTask;
 
-        return resultTask.PipeAsync(Execute);
+        if (!result.IsSuccess)
+            await sideEffect(result.Error.Value);
+        
+        return result;
     }
 
     /// <summary>
@@ -211,11 +258,14 @@ public static partial class ResultExtensions
     /// <para></para>
     /// The original <see cref="Result" /> is returned unchanged.
     /// </summary>
-    public static Task<Result> DoWhenFailureAsync(this Task<Result> resultTask, Func<IResultError, Task> sideEffect)
+    public static async Task<Result> DoWhenFailureAsync(this Task<Result> resultTask, Func<IResultError, Task> sideEffect)
     {
-        Task<Result> Execute(Result result) => result.DoWhenFailureAsync(sideEffect);
+        var result = await resultTask;
 
-        return resultTask.PipeAsync(Execute);
+        if (!result.IsSuccess)
+            await sideEffect(result.Error.Value);
+        
+        return result;
     }
 
     /// <summary>
@@ -231,8 +281,15 @@ public static partial class ResultExtensions
     /// <para></para>
     /// The original <see cref="Result{T}" /> is returned unchanged.
     /// </summary>
-    public static Task<Result<T>> DoWhenFailureAsync<T>(this Task<Result<T>> resultTask, Action sideEffect) =>
-        resultTask.DoSwitchAsync(Function<T>.DoNothing, sideEffect);
+    public static async Task<Result<T>> DoWhenFailureAsync<T>(this Task<Result<T>> resultTask, Action sideEffect)
+    {
+        var result = await resultTask;
+
+        if (!result.IsSuccess)
+            sideEffect();
+
+        return result;
+    }
 
     /// <summary>
     /// Execute a side-effect on a failed <see cref="Result" />.
@@ -247,8 +304,15 @@ public static partial class ResultExtensions
     /// <para></para>
     /// The original <see cref="Result" /> is returned unchanged.
     /// </summary>
-    public static Task<Result> DoWhenFailureAsync(this Task<Result> resultTask, Action sideEffect) =>
-        resultTask.DoSwitchAsync(Function.DoNothing, sideEffect);
+    public static async Task<Result> DoWhenFailureAsync(this Task<Result> resultTask, Action sideEffect)
+    {
+        var result = await resultTask;
+
+        if (!result.IsSuccess)
+            sideEffect();
+
+        return result;
+    }
 
     /// <summary>
     /// Execute a side-effect on a failed <see cref="Result{T}" />.
@@ -286,6 +350,13 @@ public static partial class ResultExtensions
     /// <para></para>
     /// The original <see cref="Result" /> is returned unchanged.
     /// </summary>
-    public static Task<Result> DoWhenFailureAsync(this Task<Result> resultTask, Action<IResultError> sideEffect) =>
-        resultTask.DoSwitchAsync(Function.DoNothing, sideEffect);
+    public static async Task<Result> DoWhenFailureAsync(this Task<Result> resultTask, Action<IResultError> sideEffect)
+    {
+        var result = await resultTask;
+
+        if (!result.IsSuccess)
+            sideEffect(result.Error.Value);
+
+        return result;
+    }
 }

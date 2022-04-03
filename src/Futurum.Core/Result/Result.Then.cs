@@ -1,6 +1,4 @@
-﻿using Futurum.Core.Functional;
-
-namespace Futurum.Core.Result;
+﻿namespace Futurum.Core.Result;
 
 public readonly partial struct Result
 {
@@ -16,7 +14,7 @@ public readonly partial struct Result
     /// </list>
     /// </summary>
     public Result Then(Func<Result> nextResult) =>
-        Switch(nextResult, Fail);
+        IsSuccess ? nextResult() : Fail(Error.Value);
 
     /// <summary>
     /// Transforms an <see cref="Result" /> into the next <see cref="Result{T}" />.
@@ -30,7 +28,7 @@ public readonly partial struct Result
     /// </list>
     /// </summary>
     public Result<T> Then<T>(Func<Result<T>> nextResult) =>
-        Switch(nextResult, Fail<T>);
+        IsSuccess ? nextResult() : Fail<T>(Error.Value);
 
     /// <summary>
     /// Transforms an <see cref="Result" /> into the next async <see cref="Result" />.
@@ -43,10 +41,8 @@ public readonly partial struct Result
     ///     </item>
     /// </list>
     /// </summary>
-    public Task<Result> ThenAsync(Func<Task<Result>> nextResult)
-    {
-        return Switch(nextResult, FailAsync);
-    }
+    public Task<Result> ThenAsync(Func<Task<Result>> nextResult) =>
+        IsSuccess ? nextResult() : FailAsync(Error.Value);
 
     /// <summary>
     /// Transforms an <see cref="Result" /> into the next async <see cref="Result{T}" />.
@@ -60,7 +56,7 @@ public readonly partial struct Result
     /// </list>
     /// </summary>
     public Task<Result<T>> ThenAsync<T>(Func<Task<Result<T>>> nextResult) =>
-        Switch(nextResult, FailAsync<T>);
+        IsSuccess ? nextResult() : FailAsync<T>(Error.Value);
 }
 
 public readonly partial struct Result<T>
@@ -83,8 +79,7 @@ public readonly partial struct Result<T>
     {
         var result = this;
 
-        return Switch(nextResult, Result.Fail)
-            .Then(() => result);
+        return IsSuccess ? nextResult(Value.Value).Then(() => result) : Result.Fail<T>(Error.Value);
     }
 
     /// <summary>
@@ -160,11 +155,11 @@ public static partial class ResultExtensions
     ///     </item>
     /// </list>
     /// </summary>
-    public static Task<Result> ThenAsync(this Task<Result> resultTask, Func<Task<Result>> nextResult)
+    public static async Task<Result> ThenAsync(this Task<Result> resultTask, Func<Task<Result>> nextResult)
     {
-        Task<Result> Execute(Result result) => result.ThenAsync(nextResult);
+        var result = await resultTask;
 
-        return resultTask.PipeAsync(Execute);
+        return await (result.IsSuccess ? nextResult() : Result.FailAsync(result.Error.Value));
     }
 
     /// <summary>
@@ -182,11 +177,11 @@ public static partial class ResultExtensions
     ///     </item>
     /// </list>
     /// </summary>
-    public static Task<Result<T>> ThenAsync<T>(this Task<Result> resultTask, Func<Task<Result<T>>> nextResult)
+    public static async Task<Result<T>> ThenAsync<T>(this Task<Result> resultTask, Func<Task<Result<T>>> nextResult)
     {
-        Task<Result<T>> Execute(Result result) => result.ThenAsync(nextResult);
+        var result = await resultTask;
 
-        return resultTask.PipeAsync(Execute);
+        return await (result.IsSuccess ? nextResult() : Result.FailAsync<T>(result.Error.Value));
     }
 
     /// <summary>
@@ -244,11 +239,11 @@ public static partial class ResultExtensions
     ///     </item>
     /// </list>
     /// </summary>
-    public static Task<Result> ThenAsync(this Task<Result> resultTask, Func<Result> nextResult)
+    public static async Task<Result> ThenAsync(this Task<Result> resultTask, Func<Result> nextResult)
     {
-        Result Execute(Result result) => result.Then(nextResult);
-
-        return resultTask.PipeAsync(Execute);
+        var result = await resultTask;
+        
+        return result.IsSuccess ? nextResult() : Result.Fail(result.Error.Value);
     }
 
     /// <summary>
@@ -288,11 +283,11 @@ public static partial class ResultExtensions
     ///     </item>
     /// </list>
     /// </summary>
-    public static Task<Result<T>> ThenAsync<T>(this Task<Result<T>> resultTask, Func<T, Result> nextResult)
+    public static async Task<Result<T>> ThenAsync<T>(this Task<Result<T>> resultTask, Func<T, Result> nextResult)
     {
-        Result<T> Execute(Result<T> result) => result.Then(nextResult);
+        var result = await resultTask;
 
-        return resultTask.PipeAsync(Execute);
+        return result.IsSuccess ? nextResult(result.Value.Value).Map(result.Value.Value) : Result.Fail<T>(result.Error.Value);
     }
 
     /// <summary>

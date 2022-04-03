@@ -1,5 +1,4 @@
-﻿using Futurum.Core.Functional;
-using Futurum.Core.Linq;
+﻿using Futurum.Core.Linq;
 
 namespace Futurum.Core.Result;
 
@@ -175,8 +174,12 @@ public static partial class ResultExtensions
 
     public static Result<TR> FlatMap<T, TI, TR>(this Result<IEnumerable<T>> resultSource, Func<T, Result<TI>> func, Func<IEnumerable<Result<TI>>, Result<TR>> reduce)
     {
-        Result<TR> Execute(IEnumerable<T> source) => source.Select(func)
-                                                           .Pipe(reduce);
+        Result<TR> Execute(IEnumerable<T> source)
+        {
+            var values = source.Select(func);
+            
+            return reduce(values);
+        }
 
         return resultSource.Then(Execute);
     }
@@ -300,18 +303,6 @@ public static partial class ResultExtensions
     /// </summary>
     public static Task<Result> FlatMapAsync<T>(this Task<Result<IEnumerable<T>>> resultTaskSource, Func<T, Task<Result>> func) =>
         resultTaskSource.FlatMapAsync(DefaultParallelOptions, func);
-
-    /// <summary>
-    /// Flattens each element of a sequence of sequence into one sequence.
-    /// </summary>
-    public static Task<Result<IEnumerable<T>>> FlatMapAsync<T>(this Task<Result<IEnumerable<IEnumerable<T>>>> resultTaskSource) =>
-        resultTaskSource.MapAsync(EnumerableExtensions.SelectMany);
-
-    /// <summary>
-    /// Flattens each element of a sequence of sequence into one sequence.
-    /// </summary>
-    public static Task<Result<IEnumerable<T>>> FlatMapAsync<T>(this Task<Result<IEnumerable<List<T>>>> resultTaskSource) =>
-        resultTaskSource.MapAsync(EnumerableExtensions.SelectMany);
-
+    
     private static readonly ParallelOptions DefaultParallelOptions = new();
 }

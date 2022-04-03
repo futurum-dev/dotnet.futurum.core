@@ -1,6 +1,4 @@
-﻿using Futurum.Core.Functional;
-
-namespace Futurum.Core.Result;
+﻿namespace Futurum.Core.Result;
 
 public readonly partial struct Result
 {
@@ -207,11 +205,16 @@ public static partial class ResultExtensions
     /// <para></para>
     /// The original <see cref="Result" /> is returned unchanged.
     /// </summary>
-    public static Task<Result> DoSwitchAsync(this Task<Result> resultTask, Action successFunc, Action failureFunc)
+    public static async Task<Result> DoSwitchAsync(this Task<Result> resultTask, Action successFunc, Action failureFunc)
     {
-        Result Execute(Result result) => result.DoSwitch(successFunc, failureFunc);
+        var result = await resultTask;
 
-        return resultTask.PipeAsync(Execute);
+        if (result.IsSuccess)
+            successFunc();
+        else
+            failureFunc();
+
+        return result;
     }
 
     /// <summary>
@@ -227,11 +230,16 @@ public static partial class ResultExtensions
     /// <para></para>
     /// The original <see cref="Result" /> is returned unchanged.
     /// </summary>
-    public static Task<Result> DoSwitchAsync(this Task<Result> resultTask, Action successFunc, Action<IResultError> failureFunc)
+    public static async Task<Result> DoSwitchAsync(this Task<Result> resultTask, Action successFunc, Action<IResultError> failureFunc)
     {
-        Result Execute(Result result) => result.DoSwitch(successFunc, failureFunc);
+        var result = await resultTask;
 
-        return resultTask.PipeAsync(Execute);
+        if (result.IsSuccess)
+            successFunc();
+        else
+            failureFunc(result.Error.Value);
+
+        return result;
     }
 
     /// <summary>
@@ -247,11 +255,16 @@ public static partial class ResultExtensions
     /// <para></para>
     /// The original <see cref="Result{T}" /> is returned unchanged.
     /// </summary>
-    public static Task<Result<T>> DoSwitchAsync<T>(this Task<Result<T>> resultTask, Action<T> successFunc, Action failureFunc)
+    public static async Task<Result<T>> DoSwitchAsync<T>(this Task<Result<T>> resultTask, Action<T> successFunc, Action failureFunc)
     {
-        Result<T> Execute(Result<T> result) => result.DoSwitch(successFunc, failureFunc);
+        var result = await resultTask;
 
-        return resultTask.PipeAsync(Execute);
+        if (result.IsSuccess)
+            successFunc(result.Value.Value);
+        else
+            failureFunc();
+
+        return result;
     }
 
     /// <summary>

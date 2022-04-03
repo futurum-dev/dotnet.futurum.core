@@ -1,5 +1,3 @@
-using Futurum.Core.Functional;
-
 namespace Futurum.Core.Result;
 
 public readonly partial struct Result
@@ -72,40 +70,40 @@ public static partial class ResultExtensions
     /// <summary>
     /// If async <see cref="Result"/> <see cref="Result.IsFailure"/> is true, then add additional error context
     /// </summary>
-    public static Task<Result> EnhanceWithErrorAsync(this Task<Result> resultTask, Func<string> errorMessage)
+    public static async Task<Result> EnhanceWithErrorAsync(this Task<Result> resultTask, Func<string> errorMessage)
     {
-        Result Execute(Result result) => result.EnhanceWithError(errorMessage);
+        var result = await resultTask;
 
-        return resultTask.PipeAsync(Execute);
+        return result.EnhanceWithError(errorMessage);
     }
 
     /// <summary>
     /// If async <see cref="Result"/> <see cref="Result.IsFailure"/> is true, then add additional error context
     /// </summary>
-    public static Task<Result> EnhanceWithErrorAsync(this Task<Result> resultTask, Func<IResultErrorNonComposite> error)
+    public static async Task<Result> EnhanceWithErrorAsync(this Task<Result> resultTask, Func<IResultErrorNonComposite> error)
     {
-        Result Execute(Result result) => result.EnhanceWithError(error);
+        var result = await resultTask;
 
-        return resultTask.PipeAsync(Execute);
+        return result.EnhanceWithError(error);
     }
 
     /// <summary>
     /// If async <see cref="Result{T}"/> <see cref="Result{T}.IsFailure"/> is true, then add additional error context
     /// </summary>
-    public static Task<Result<T>> EnhanceWithErrorAsync<T>(this Task<Result<T>> resultTask, Func<string> errorMessage)
+    public static async Task<Result<T>> EnhanceWithErrorAsync<T>(this Task<Result<T>> resultTask, Func<string> errorMessage)
     {
-        Result<T> Execute(Result<T> result) => result.EnhanceWithError(errorMessage);
+        var result = await resultTask;
 
-        return resultTask.PipeAsync(Execute);
+        return result.EnhanceWithError(errorMessage);
     }
 
     /// <summary>
     /// If async <see cref="Result{T}"/> <see cref="Result{T}.IsFailure"/> is true, then add additional error context
     /// </summary>
-    public static Task<Result<T>> EnhanceWithErrorAsync<T>(this Task<Result<T>> resultTask, Func<IResultErrorNonComposite> error)
+    public static async Task<Result<T>> EnhanceWithErrorAsync<T>(this Task<Result<T>> resultTask, Func<IResultErrorNonComposite> error)
     {
-        Result<T> Execute(Result<T> result) => result.EnhanceWithError(error);
+        var result = await resultTask;
 
-        return resultTask.PipeAsync(Execute);
+        return result.EnhanceWithError(error);
     }
 }
