@@ -1,6 +1,4 @@
-﻿using Futurum.Core.Functional;
-
-namespace Futurum.Core.Result;
+﻿namespace Futurum.Core.Result;
 
 public readonly partial struct Result
 {
@@ -151,11 +149,13 @@ public static partial class ResultExtensions
     ///     </item>
     /// </list>
     /// </summary>
-    public static Task<Result<T>> ThenTryAsync<T>(this Task<Result> resultTask, Func<Task<T>> func, Func<string> errorMessage)
+    public static async Task<Result<T>> ThenTryAsync<T>(this Task<Result> resultTask, Func<Task<T>> func, Func<string> errorMessage)
     {
-        Task<Result<T>> Execute(Result result) => result.ThenTryAsync(func, errorMessage);
+        var result = await resultTask;
+        
+        Task<Result<T>> Execute() => Result.TryAsync(func, errorMessage);
 
-        return resultTask.PipeAsync(Execute);
+        return await result.ThenAsync(Execute);
     }
 
     /// <summary>
@@ -173,11 +173,18 @@ public static partial class ResultExtensions
     ///     </item>
     /// </list>
     /// </summary>
-    public static Task<Result<TR>> ThenTryAsync<T, TR>(this Task<Result<T>> resultTask, Func<T, Task<TR>> func, Func<string> errorMessage)
+    public static async Task<Result<TR>> ThenTryAsync<T, TR>(this Task<Result<T>> resultTask, Func<T, Task<TR>> func, Func<string> errorMessage)
     {
-        Task<Result<TR>> Execute(Result<T> result) => result.ThenTryAsync(func, errorMessage);
+        var result = await resultTask;
 
-        return resultTask.PipeAsync(Execute);
+        Task<Result<TR>> Execute(T value)
+        {
+            Task<TR> ExecuteTry() => func(value);
+
+            return Result.TryAsync(ExecuteTry, errorMessage);
+        }
+
+        return await result.ThenAsync(Execute);
     }
 
     /// <summary>
@@ -195,11 +202,13 @@ public static partial class ResultExtensions
     ///     </item>
     /// </list>
     /// </summary>
-    public static Task<Result<T>> ThenTryAsync<T>(this Task<Result> resultTask, Func<T> func, Func<string> errorMessage)
+    public static async Task<Result<T>> ThenTryAsync<T>(this Task<Result> resultTask, Func<T> func, Func<string> errorMessage)
     {
-        Result<T> Execute(Result result) => result.ThenTry(func, errorMessage);
+        var result = await resultTask;
+        
+        Result<T> Execute() => Result.Try(func, errorMessage);
 
-        return resultTask.PipeAsync(Execute);
+        return result.Then(Execute);
     }
 
     /// <summary>
@@ -217,10 +226,17 @@ public static partial class ResultExtensions
     ///     </item>
     /// </list>
     /// </summary>
-    public static Task<Result<TR>> ThenTryAsync<T, TR>(this Task<Result<T>> resultTask, Func<T, TR> func, Func<string> errorMessage)
+    public static async Task<Result<TR>> ThenTryAsync<T, TR>(this Task<Result<T>> resultTask, Func<T, TR> func, Func<string> errorMessage)
     {
-        Result<TR> Execute(Result<T> result) => result.ThenTry(func, errorMessage);
+        var result = await resultTask;
 
-        return resultTask.PipeAsync(Execute);
+        Result<TR> Execute(T value)
+        {
+            TR ExecuteTry() => func(value);
+
+            return Result.Try(ExecuteTry, errorMessage);
+        }
+
+        return result.Then(Execute);
     }
 }

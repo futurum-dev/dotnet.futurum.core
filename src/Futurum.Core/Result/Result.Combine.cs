@@ -1,4 +1,3 @@
-using Futurum.Core.Functional;
 using Futurum.Core.Linq;
 
 namespace Futurum.Core.Result;
@@ -221,9 +220,12 @@ public static partial class ResultExtensions
     ///     </item>
     /// </list>
     /// </summary>
-    public static Task<Result> CombineAsync(this IEnumerable<Task<Result>> resultTasks) =>
-        Task.WhenAll(resultTasks)
-            .PipeAsync(Combine);
+    public static async Task<Result> CombineAsync(this IEnumerable<Task<Result>> resultTasks)
+    {
+        var results = await Task.WhenAll(resultTasks);
+
+        return Combine(results);
+    }
 
     /// <summary>
     /// Combines multiple <see cref="Result{T}"/>'s into one.
@@ -240,9 +242,12 @@ public static partial class ResultExtensions
     ///     </item>
     /// </list>
     /// </summary>
-    public static Task<Result<IEnumerable<T>>> CombineAsync<T>(this IEnumerable<Task<Result<T>>> resultTasks) =>
-        Task.WhenAll(resultTasks)
-            .PipeAsync(Combine);
+    public static async Task<Result<IEnumerable<T>>> CombineAsync<T>(this IEnumerable<Task<Result<T>>> resultTasks)
+    {
+        var results = await Task.WhenAll(resultTasks);
+
+        return Combine(results);
+    }
 
     /// <summary>
     /// Combines multiple <see cref="Result{T}"/>'s into one.
@@ -259,10 +264,12 @@ public static partial class ResultExtensions
     ///     </item>
     /// </list>
     /// </summary>
-    public static Task<Result<IEnumerable<T>>> CombineAsync<T>(this IEnumerable<Task<Result<IEnumerable<T>>>> resultTasks) =>
-        Task.WhenAll(resultTasks)
-            .PipeAsync(Combine<IEnumerable<T>>)
-            .FlatMapAsync();
+    public static async Task<Result<IEnumerable<T>>> CombineAsync<T>(this IEnumerable<Task<Result<IEnumerable<T>>>> resultTasks)
+    {
+        var results = await Task.WhenAll(resultTasks);
+
+        return Combine<IEnumerable<T>>(results).FlatMap();
+    }
 
     /// <summary>
     /// Combines multiple <see cref="Result{T}"/>'s into one.
@@ -279,8 +286,10 @@ public static partial class ResultExtensions
     ///     </item>
     /// </list>
     /// </summary>
-    public static Task<Result<IEnumerable<T>>> CombineAsync<T>(this IEnumerable<Task<Result<List<T>>>> resultTasks) =>
-        Task.WhenAll(resultTasks)
-            .PipeAsync(Combine<List<T>>)
-            .FlatMapAsync();
+    public static async Task<Result<IEnumerable<T>>> CombineAsync<T>(this IEnumerable<Task<Result<List<T>>>> resultTasks)
+    {
+        var results = await Task.WhenAll(resultTasks);
+
+        return Combine<List<T>>(results).FlatMap();
+    }
 }

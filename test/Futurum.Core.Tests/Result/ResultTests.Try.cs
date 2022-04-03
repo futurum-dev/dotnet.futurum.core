@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 
-using Futurum.Core.Functional;
 using Futurum.Core.Result;
 using Futurum.Core.Tests.Helper.Result;
 
@@ -32,7 +31,7 @@ public class ResultTryTests
                 [Fact]
                 public void Success()
                 {
-                    var result = Core.Result.Result.Try(Function.DoNothing,
+                    var result = Core.Result.Result.Try(() => {},
                                                         () => ErrorMessage2);
 
                     result.ShouldBeSuccess();
@@ -53,7 +52,7 @@ public class ResultTryTests
                 [Fact]
                 public void Success()
                 {
-                    var result = Core.Result.Result.Try(Function.DoNothing,
+                    var result = Core.Result.Result.Try(() => {},
                                                         () => ErrorMessage2.ToResultError());
 
                     result.ShouldBeSuccess();

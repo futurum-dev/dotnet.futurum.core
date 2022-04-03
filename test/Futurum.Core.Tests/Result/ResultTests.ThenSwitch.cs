@@ -12,7 +12,8 @@ namespace Futurum.Core.Tests.Result;
 
 public class ResultThenSwitchTests
 {
-    private const string ErrorMessage = "ERROR_MESSAGE_1";
+    private const string ErrorMessage1 = "ERROR_MESSAGE_1";
+    private const string ErrorMessage2 = "ERROR_MESSAGE_2";
 
     public class Sync
     {
@@ -24,13 +25,13 @@ public class ResultThenSwitchTests
                 var trueValue = Guid.NewGuid();
                 var falseValue = Guid.NewGuid();
 
-                var resultInput = Core.Result.Result.Fail<int>(ErrorMessage);
+                var resultInput = Core.Result.Result.Fail<int>(ErrorMessage1);
 
                 var returnedResult = resultInput.ThenSwitch(_ => false,
                                                             _ => Core.Result.Result.Ok(trueValue),
                                                             _ => Core.Result.Result.Ok(falseValue));
 
-                returnedResult.ShouldBeFailureWithError(ErrorMessage);
+                returnedResult.ShouldBeFailureWithError(ErrorMessage1);
             }
 
             [Fact]
@@ -39,13 +40,13 @@ public class ResultThenSwitchTests
                 var trueValue = Guid.NewGuid();
                 var falseValue = Guid.NewGuid();
 
-                var resultInput = Core.Result.Result.Fail<int>(ErrorMessage);
+                var resultInput = Core.Result.Result.Fail<int>(ErrorMessage1);
 
                 var returnedResult = resultInput.ThenSwitch(_ => true,
                                                             _ => Core.Result.Result.Ok(trueValue),
                                                             _ => Core.Result.Result.Ok(falseValue));
 
-                returnedResult.ShouldBeFailureWithError(ErrorMessage);
+                returnedResult.ShouldBeFailureWithError(ErrorMessage1);
             }
 
             [Fact]
@@ -107,13 +108,13 @@ public class ResultThenSwitchTests
                 var trueValue = Guid.NewGuid();
                 var falseValue = Guid.NewGuid();
 
-                var resultInput = Core.Result.Result.Fail<int>(ErrorMessage);
+                var resultInput = Core.Result.Result.Fail<int>(ErrorMessage1);
 
                 var returnedResult = resultInput.ThenSwitch(_ => false,
                                                             _ => Core.Result.Result.Ok(trueValue),
                                                             () => Core.Result.Result.Ok(falseValue));
 
-                returnedResult.ShouldBeFailureWithError(ErrorMessage);
+                returnedResult.ShouldBeFailureWithError(ErrorMessage1);
             }
 
             [Fact]
@@ -122,13 +123,13 @@ public class ResultThenSwitchTests
                 var trueValue = Guid.NewGuid();
                 var falseValue = Guid.NewGuid();
 
-                var resultInput = Core.Result.Result.Fail<int>(ErrorMessage);
+                var resultInput = Core.Result.Result.Fail<int>(ErrorMessage1);
 
                 var returnedResult = resultInput.ThenSwitch(_ => true,
                                                             _ => Core.Result.Result.Ok(trueValue),
                                                             () => Core.Result.Result.Ok(falseValue));
 
-                returnedResult.ShouldBeFailureWithError(ErrorMessage);
+                returnedResult.ShouldBeFailureWithError(ErrorMessage1);
             }
 
             [Fact]
@@ -181,6 +182,87 @@ public class ResultThenSwitchTests
                 returnedResult.ShouldBeSuccessWithValue(trueValue);
             }
         }
+
+        public class FalseErrorPayload
+        {
+            [Fact]
+            public void FailureInputThatDoesMatchesPredicate()
+            {
+                var trueValue = Guid.NewGuid();
+
+                var resultInput = Core.Result.Result.Fail<int>(ErrorMessage1);
+
+                var returnedResult = resultInput.ThenSwitch(_ => Core.Result.Result.Fail(ErrorMessage2),
+                                                            _ => Core.Result.Result.Ok(trueValue),
+                                                            error => Core.Result.Result.Fail<Guid>(error));
+
+                returnedResult.ShouldBeFailureWithError(ErrorMessage1);
+            }
+
+            [Fact]
+            public void FailureInputThatMatchesPredicate()
+            {
+                var trueValue = Guid.NewGuid();
+
+                var resultInput = Core.Result.Result.Fail<int>(ErrorMessage1);
+
+                var returnedResult = resultInput.ThenSwitch(_ => Core.Result.Result.Fail(ErrorMessage2),
+                                                            _ => Core.Result.Result.Ok(trueValue),
+                                                            error => Core.Result.Result.Fail<Guid>(error));
+
+                returnedResult.ShouldBeFailureWithError(ErrorMessage1);
+            }
+
+            [Fact]
+            public void SuccessInputThatDoesMatchesPredicate()
+            {
+                var inputValue = Guid.NewGuid();
+
+                var trueValue = Guid.NewGuid();
+                var falseValue = Guid.NewGuid();
+
+                var passedValue = Guid.Empty;
+
+                var resultInput = Core.Result.Result.Ok(inputValue);
+
+                var returnedResult = resultInput.ThenSwitch(value =>
+                                                            {
+                                                                passedValue = value;
+
+                                                                return Core.Result.Result.Fail(ErrorMessage2);
+                                                            },
+                                                            _ => Core.Result.Result.Ok(trueValue),
+                                                            error => Core.Result.Result.Fail<Guid>(error));
+
+                passedValue.Should().Be(inputValue);
+                returnedResult.ShouldBeFailureWithError(ErrorMessage2);
+            }
+
+            [Fact]
+            public void SuccessInputThatMatchesPredicate()
+            {
+                var inputValue = Guid.NewGuid();
+
+                var trueValue = Guid.NewGuid();
+                var falseValue = Guid.NewGuid();
+
+                var passedValue = Guid.Empty;
+
+                var resultInput = Core.Result.Result.Ok(inputValue);
+
+                var returnedResult = resultInput.ThenSwitch(value =>
+                                                            {
+                                                                passedValue = value;
+
+                                                                return Core.Result.Result.Ok();
+                                                            },
+                                                            _ => Core.Result.Result.Ok(trueValue),
+                                                            error => Core.Result.Result.Fail<Guid>(error));
+
+                passedValue.Should().Be(inputValue);
+                returnedResult.ShouldBeSuccessWithValue(trueValue);
+            }
+        }
     }
 
     public class Async
@@ -193,13 +275,13 @@ public class ResultThenSwitchTests
                 var trueValue = Guid.NewGuid();
                 var falseValue = Guid.NewGuid();
 
-                var resultInput = Core.Result.Result.FailAsync<int>(ErrorMessage);
+                var resultInput = Core.Result.Result.FailAsync<int>(ErrorMessage1);
 
                 var returnedResult = await resultInput.ThenSwitchAsync(_ => false,
                                                                        _ => Core.Result.Result.Ok(trueValue),
                                                                        _ => Core.Result.Result.Ok(falseValue));
 
-                returnedResult.ShouldBeFailureWithError(ErrorMessage);
+                returnedResult.ShouldBeFailureWithError(ErrorMessage1);
             }
 
             [Fact]
@@ -208,13 +290,13 @@ public class ResultThenSwitchTests
                 var trueValue = Guid.NewGuid();
                 var falseValue = Guid.NewGuid();
 
-                var resultInput = Core.Result.Result.FailAsync<int>(ErrorMessage);
+                var resultInput = Core.Result.Result.FailAsync<int>(ErrorMessage1);
 
                 var returnedResult = await resultInput.ThenSwitchAsync(_ => true,
                                                                        _ => Core.Result.Result.Ok(trueValue),
                                                                        _ => Core.Result.Result.Ok(falseValue));
 
-                returnedResult.ShouldBeFailureWithError(ErrorMessage);
+                returnedResult.ShouldBeFailureWithError(ErrorMessage1);
             }
 
             [Fact]
@@ -276,13 +358,13 @@ public class ResultThenSwitchTests
                 var trueValue = Guid.NewGuid();
                 var falseValue = Guid.NewGuid();
 
-                var resultInput = Core.Result.Result.FailAsync<int>(ErrorMessage);
+                var resultInput = Core.Result.Result.FailAsync<int>(ErrorMessage1);
 
                 var returnedResult = await resultInput.ThenSwitchAsync(_ => false,
                                                                        _ => Core.Result.Result.Ok(trueValue),
                                                                        () => Core.Result.Result.Ok(falseValue));
 
-                returnedResult.ShouldBeFailureWithError(ErrorMessage);
+                returnedResult.ShouldBeFailureWithError(ErrorMessage1);
             }
 
             [Fact]
@@ -291,13 +373,13 @@ public class ResultThenSwitchTests
                 var trueValue = Guid.NewGuid();
                 var falseValue = Guid.NewGuid();
 
-                var resultInput = Core.Result.Result.FailAsync<int>(ErrorMessage);
+                var resultInput = Core.Result.Result.FailAsync<int>(ErrorMessage1);
 
                 var returnedResult = await resultInput.ThenSwitchAsync(_ => true,
                                                                        _ => Core.Result.Result.Ok(trueValue),
                                                                        () => Core.Result.Result.Ok(falseValue));
 
-                returnedResult.ShouldBeFailureWithError(ErrorMessage);
+                returnedResult.ShouldBeFailureWithError(ErrorMessage1);
             }
 
             [Fact]

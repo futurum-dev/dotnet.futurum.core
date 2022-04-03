@@ -1,4 +1,3 @@
-using Futurum.Core.Functional;
 using Futurum.Core.Result;
 
 namespace Futurum.Core.Option;
@@ -27,12 +26,10 @@ public static partial class ResultOptionExtensions
     ///     </item>
     /// </list>
     /// </summary>
-    public static Result<TR> MapSwitch<T, TR>(this Result<Option<T>> resultOption, Func<T, TR> hasValueFunc, Func<TR> hasNoValueFunc)
-    {
-        TR Execute(Option<T> option) => option.Switch(hasValueFunc, hasNoValueFunc);
-
-        return resultOption.Map(Execute);
-    }
+    public static Result<TR> MapSwitch<T, TR>(this Result<Option<T>> resultOption, Func<T, TR> hasValueFunc, Func<TR> hasNoValueFunc) =>
+        resultOption.IsFailure
+            ? Result.Result.Fail<TR>(resultOption.Error.Value)
+            : (resultOption.Value.Value.HasValue ? hasValueFunc(resultOption.Value.Value.Value) : hasNoValueFunc()).ToResultOk();
 
     /// <summary>
     /// Transforms <see cref="Result{T}"/> <see cref="Option{T}"/> to <see cref="Result{T}"/> <typeparamref name="TR"/>
@@ -56,10 +53,12 @@ public static partial class ResultOptionExtensions
     ///     </item>
     /// </list>
     /// </summary>
-    public static Task<Result<TR>> MapMatchAsync<T, TR>(this Task<Result<Option<T>>> resultOptionTask, Func<T, TR> hasValueFunc, Func<TR> hasNoValueFunc)
+    public static async Task<Result<TR>> MapMatchAsync<T, TR>(this Task<Result<Option<T>>> resultOptionTask, Func<T, TR> hasValueFunc, Func<TR> hasNoValueFunc)
     {
-        Result<TR> Execute(Result<Option<T>> resultOption) => resultOption.MapSwitch(hasValueFunc, hasNoValueFunc);
+        var resultOption = await resultOptionTask;
 
-        return resultOptionTask.PipeAsync(Execute);
+        return resultOption.IsFailure
+            ? Result.Result.Fail<TR>(resultOption.Error.Value)
+            : (resultOption.Value.Value.HasValue ? hasValueFunc(resultOption.Value.Value.Value) : hasNoValueFunc()).ToResultOk();
     }
 }

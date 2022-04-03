@@ -1,5 +1,3 @@
-using Futurum.Core.Functional;
-
 namespace Futurum.Core.Result;
 
 public static partial class ResultEnumerableExtensions
@@ -19,6 +17,10 @@ public static partial class ResultEnumerableExtensions
     /// Filters <see cref="Result"/> <see cref="IEnumerable{T}"/> using <paramref name="func"/>.
     /// <para>This implicitly understands <see cref="IEnumerable{T}"/></para>
     /// </summary>
-    public static Task<Result<IEnumerable<T>>> FilterAsync<T>(this Task<Result<IEnumerable<T>>> resultTask, Func<T, bool> func) =>
-        resultTask.PipeAsync(Filter, func);
+    public static async Task<Result<IEnumerable<T>>> FilterAsync<T>(this Task<Result<IEnumerable<T>>> resultTask, Func<T, bool> func)
+    {
+        var result = await resultTask;
+
+        return result.Filter(func);
+    }
 }

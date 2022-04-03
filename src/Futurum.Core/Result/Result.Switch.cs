@@ -1,6 +1,4 @@
-﻿using Futurum.Core.Functional;
-
-namespace Futurum.Core.Result;
+﻿namespace Futurum.Core.Result;
 
 public readonly partial struct Result
 {
@@ -133,11 +131,11 @@ public static partial class ResultExtensions
     ///     </item>
     /// </list>
     /// </summary>
-    public static Task<T> SwitchAsync<T>(this Task<Result> resultTask, Func<T> successFunc, Func<T> failureFunc)
+    public static async Task<T> SwitchAsync<T>(this Task<Result> resultTask, Func<T> successFunc, Func<T> failureFunc)
     {
-        T Execute(Result result) => result.Switch(successFunc, failureFunc);
+        var result = await resultTask;
 
-        return resultTask.PipeAsync(Execute);
+        return result.IsSuccess ? successFunc() : failureFunc();
     }
 
     /// <summary>
@@ -151,11 +149,11 @@ public static partial class ResultExtensions
     ///     </item>
     /// </list>
     /// </summary>
-    public static Task<T> SwitchAsync<T>(this Task<Result> resultTask, Func<T> successFunc, Func<IResultError, T> failureFunc)
+    public static async Task<T> SwitchAsync<T>(this Task<Result> resultTask, Func<T> successFunc, Func<IResultError, T> failureFunc)
     {
-        T Execute(Result result) => result.Switch(successFunc, failureFunc);
+        var result = await resultTask;
 
-        return resultTask.PipeAsync(Execute);
+        return result.IsSuccess ? successFunc() : failureFunc(result.Error.Value);
     }
 
     /// <summary>
@@ -169,11 +167,11 @@ public static partial class ResultExtensions
     ///     </item>
     /// </list>
     /// </summary>
-    public static Task<TR> SwitchAsync<T, TR>(this Task<Result<T>> resultTask, Func<T, TR> successFunc, Func<TR> failureFunc)
+    public static async Task<TR> SwitchAsync<T, TR>(this Task<Result<T>> resultTask, Func<T, TR> successFunc, Func<TR> failureFunc)
     {
-        TR Execute(Result<T> result) => result.Switch(successFunc, failureFunc);
+        var result = await resultTask;
 
-        return resultTask.PipeAsync(Execute);
+        return result.IsSuccess ? successFunc(result.Value.Value) : failureFunc();
     }
 
     /// <summary>
@@ -187,11 +185,11 @@ public static partial class ResultExtensions
     ///     </item>
     /// </list>
     /// </summary>
-    public static Task<TR> SwitchAsync<T, TR>(this Task<Result<T>> resultTask, Func<T, TR> successFunc, Func<IResultError, TR> failureFunc)
+    public static async Task<TR> SwitchAsync<T, TR>(this Task<Result<T>> resultTask, Func<T, TR> successFunc, Func<IResultError, TR> failureFunc)
     {
-        TR Execute(Result<T> result) => result.Switch(successFunc, failureFunc);
+        var result = await resultTask;
 
-        return resultTask.PipeAsync(Execute);
+        return result.IsSuccess ? successFunc(result.Value.Value) : failureFunc(result.Error.Value);
     }
 
     /// <summary>

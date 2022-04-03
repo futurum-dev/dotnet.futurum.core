@@ -1,6 +1,4 @@
-﻿using Futurum.Core.Functional;
-
-namespace Futurum.Core.Result;
+﻿namespace Futurum.Core.Result;
 
 public static partial class ResultExtensions
 {
@@ -17,9 +15,13 @@ public static partial class ResultExtensions
     /// </summary>
     public static Result<TR> ThenSwitch<T, TR>(this Result<T> result, Func<T, bool> predicate, Func<T, Result<TR>> successFunc, Func<Result<TR>> failureFunc)
     {
-        Result<TR> Execute(T value) => predicate(value) ? successFunc(value) : failureFunc();
+        if (result.IsSuccess)
+        {
+            var value = result.Value.Value;
+            return predicate(value) ? successFunc(value) : failureFunc();
+        }
 
-        return result.Then(Execute);
+        return Result.Fail<TR>(result.Error.Value);
     }
 
     /// <summary>
@@ -35,9 +37,13 @@ public static partial class ResultExtensions
     /// </summary>
     public static Result<TR> ThenSwitch<T, TR>(this Result<T> result, Func<T, Result> predicate, Func<T, Result<TR>> successFunc, Func<IResultError, Result<TR>> failureFunc)
     {
-        Result<TR> Execute(T value) => predicate(value).Switch(() => successFunc(value), failureFunc);
+        if (result.IsSuccess)
+        {
+            var value = result.Value.Value;
+            return predicate(value).Switch(() => successFunc(value), failureFunc);
+        }
 
-        return result.Then(Execute);
+        return Result.Fail<TR>(result.Error.Value);
     }
 
     /// <summary>
@@ -53,9 +59,13 @@ public static partial class ResultExtensions
     /// </summary>
     public static Result<TR> ThenSwitch<T, TR>(this Result<T> result, Func<T, bool> predicate, Func<T, Result<TR>> successFunc, Func<T, Result<TR>> failureFunc)
     {
-        Result<TR> Execute(T value) => predicate(value) ? successFunc(value) : failureFunc(value);
+        if (result.IsSuccess)
+        {
+            var value = result.Value.Value;
+            return predicate(value) ? successFunc(value) : failureFunc(value);
+        }
 
-        return result.Then(Execute);
+        return Result.Fail<TR>(result.Error.Value);
     }
 
     /// <summary>
@@ -69,11 +79,17 @@ public static partial class ResultExtensions
     ///     </item>
     /// </list>
     /// </summary>
-    public static Task<Result<TR>> ThenSwitchAsync<T, TR>(this Task<Result<T>> resultTask, Func<T, bool> predicate, Func<T, Result<TR>> successFunc, Func<Result<TR>> failureFunc)
+    public static async Task<Result<TR>> ThenSwitchAsync<T, TR>(this Task<Result<T>> resultTask, Func<T, bool> predicate, Func<T, Result<TR>> successFunc, Func<Result<TR>> failureFunc)
     {
-        Result<TR> Execute(Result<T> result) => result.ThenSwitch(predicate, successFunc, failureFunc);
+        var result = await resultTask;
 
-        return resultTask.PipeAsync(Execute);
+        if (result.IsSuccess)
+        {
+            var value = result.Value.Value;
+            return predicate(value) ? successFunc(value) : failureFunc();
+        }
+
+        return Result.Fail<TR>(result.Error.Value);
     }
 
     /// <summary>
@@ -87,10 +103,16 @@ public static partial class ResultExtensions
     ///     </item>
     /// </list>
     /// </summary>
-    public static Task<Result<TR>> ThenSwitchAsync<T, TR>(this Task<Result<T>> resultTask, Func<T, bool> predicate, Func<T, Result<TR>> successFunc, Func<T, Result<TR>> failureFunc)
+    public static async Task<Result<TR>> ThenSwitchAsync<T, TR>(this Task<Result<T>> resultTask, Func<T, bool> predicate, Func<T, Result<TR>> successFunc, Func<T, Result<TR>> failureFunc)
     {
-        Result<TR> Execute(Result<T> result) => result.ThenSwitch(predicate, successFunc, failureFunc);
+        var result = await resultTask;
 
-        return resultTask.PipeAsync(Execute);
+        if (result.IsSuccess)
+        {
+            var value = result.Value.Value;
+            return predicate(value) ? successFunc(value) : failureFunc(value);
+        }
+
+        return Result.Fail<TR>(result.Error.Value);
     }
 }

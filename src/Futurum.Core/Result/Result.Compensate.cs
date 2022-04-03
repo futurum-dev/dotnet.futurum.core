@@ -1,5 +1,3 @@
-using Futurum.Core.Functional;
-
 namespace Futurum.Core.Result;
 
 public readonly partial struct Result
@@ -16,7 +14,7 @@ public readonly partial struct Result
     /// </list>
     /// </summary>
     public Result Compensate(Func<Result> compensatingFunc) =>
-        Switch(Ok, compensatingFunc);
+        IsSuccess ? Ok() : compensatingFunc();
 
     /// <summary>
     /// Allows a different <see cref="Result" /> to be provided in the case of a failed <see cref="Result" />.
@@ -30,7 +28,7 @@ public readonly partial struct Result
     /// </list>
     /// </summary>
     public Result Compensate(Func<IResultError, Result> compensatingFunc) =>
-        Switch(Ok, compensatingFunc);
+        IsSuccess ? Ok() : compensatingFunc(Error.Value);
 
     /// <summary>
     /// Allows a different async <see cref="Result" /> to be provided in the case of a failed <see cref="Result" />.
@@ -44,7 +42,7 @@ public readonly partial struct Result
     /// </list>
     /// </summary>
     public Task<Result> CompensateAsync(Func<Task<Result>> compensatingFunc) =>
-        SwitchAsync(OkAsync, compensatingFunc);
+        IsSuccess ? OkAsync() : compensatingFunc();
 
     /// <summary>
     /// Allows a different async <see cref="Result" /> to be provided in the case of a failed <see cref="Result" />.
@@ -58,7 +56,7 @@ public readonly partial struct Result
     /// </list>
     /// </summary>
     public Task<Result> CompensateAsync(Func<IResultError, Task<Result>> compensatingFunc) =>
-        SwitchAsync(OkAsync, compensatingFunc);
+        IsSuccess ? OkAsync() : compensatingFunc(Error.Value);
 }
 
 public readonly partial struct Result<T>
@@ -75,7 +73,7 @@ public readonly partial struct Result<T>
     /// </list>
     /// </summary>
     public Result<T> Compensate(Func<Result<T>> compensatingFunc) =>
-        Switch(Result.Ok, compensatingFunc);
+        IsSuccess ? Result.Ok(Value.Value) : compensatingFunc();
 
     /// <summary>
     /// Allows a different <see cref="Result{T}" /> to be provided in the case of a failed <see cref="Result{T}" />.
@@ -89,7 +87,7 @@ public readonly partial struct Result<T>
     /// </list>
     /// </summary>
     public Result<T> Compensate(Func<IResultError, Result<T>> compensatingFunc) =>
-        Switch(Result.Ok, compensatingFunc);
+        IsSuccess ? Result.Ok(Value.Value) : compensatingFunc(Error.Value);
 
     /// <summary>
     /// Allows a different async <see cref="Result{T}" /> to be provided in the case of a failed <see cref="Result{T}" />.
@@ -103,7 +101,7 @@ public readonly partial struct Result<T>
     /// </list>
     /// </summary>
     public Task<Result<T>> CompensateAsync(Func<Task<Result<T>>> compensatingFunc) =>
-        SwitchAsync(Result.OkAsync, compensatingFunc);
+        IsSuccess ? Result.OkAsync(Value.Value) : compensatingFunc();
 
     /// <summary>
     /// Allows a different async <see cref="Result{T}" /> to be provided in the case of a failed <see cref="Result{T}" />.
@@ -117,7 +115,7 @@ public readonly partial struct Result<T>
     /// </list>
     /// </summary>
     public Task<Result<T>> CompensateAsync(Func<IResultError, Task<Result<T>>> compensatingFunc) =>
-        SwitchAsync(Result.OkAsync, compensatingFunc);
+        IsSuccess ? Result.OkAsync(Value.Value) : compensatingFunc(Error.Value);
 }
 
 public static partial class ResultExtensions
@@ -133,11 +131,11 @@ public static partial class ResultExtensions
     ///     </item>
     /// </list>
     /// </summary>
-    public static Task<Result<T>> CompensateAsync<T>(this Task<Result<T>> resultTask, Func<Task<Result<T>>> compensatingFunc)
+    public static async Task<Result<T>> CompensateAsync<T>(this Task<Result<T>> resultTask, Func<Task<Result<T>>> compensatingFunc)
     {
-        Task<Result<T>> Execute(Result<T> result) => result.CompensateAsync(compensatingFunc);
+        var result = await resultTask;
 
-        return resultTask.PipeAsync(Execute);
+        return await (result.IsSuccess ? Result.OkAsync(result.Value.Value) : compensatingFunc());
     }
 
     /// <summary>
@@ -151,11 +149,11 @@ public static partial class ResultExtensions
     ///     </item>
     /// </list>
     /// </summary>
-    public static Task<Result> CompensateAsync(this Task<Result> resultTask, Func<Task<Result>> compensatingFunc)
+    public static async Task<Result> CompensateAsync(this Task<Result> resultTask, Func<Task<Result>> compensatingFunc)
     {
-        Task<Result> Execute(Result result) => result.CompensateAsync(compensatingFunc);
+        var result = await resultTask;
 
-        return resultTask.PipeAsync(Execute);
+        return await (result.IsSuccess ? Result.OkAsync() : compensatingFunc());
     }
 
     /// <summary>
@@ -169,11 +167,11 @@ public static partial class ResultExtensions
     ///     </item>
     /// </list>
     /// </summary>
-    public static Task<Result<T>> CompensateAsync<T>(this Task<Result<T>> resultTask, Func<IResultError, Task<Result<T>>> compensatingFunc)
+    public static async Task<Result<T>> CompensateAsync<T>(this Task<Result<T>> resultTask, Func<IResultError, Task<Result<T>>> compensatingFunc)
     {
-        Task<Result<T>> Execute(Result<T> result) => result.CompensateAsync(compensatingFunc);
+        var result = await resultTask;
 
-        return resultTask.PipeAsync(Execute);
+        return await (result.IsSuccess ? Result.OkAsync(result.Value.Value) : compensatingFunc(result.Error.Value));
     }
 
     /// <summary>
@@ -187,11 +185,11 @@ public static partial class ResultExtensions
     ///     </item>
     /// </list>
     /// </summary>
-    public static Task<Result> CompensateAsync(this Task<Result> resultTask, Func<IResultError, Task<Result>> compensatingFunc)
+    public static async Task<Result> CompensateAsync(this Task<Result> resultTask, Func<IResultError, Task<Result>> compensatingFunc)
     {
-        Task<Result> Execute(Result result) => result.CompensateAsync(compensatingFunc);
+        var result = await resultTask;
 
-        return resultTask.PipeAsync(Execute);
+        return await (result.IsSuccess ? Result.OkAsync() : compensatingFunc(result.Error.Value));
     }
 
     /// <summary>
@@ -205,11 +203,11 @@ public static partial class ResultExtensions
     ///     </item>
     /// </list>
     /// </summary>
-    public static Task<Result<T>> CompensateAsync<T>(this Task<Result<T>> resultTask, Func<Result<T>> compensatingFunc)
+    public static async Task<Result<T>> CompensateAsync<T>(this Task<Result<T>> resultTask, Func<Result<T>> compensatingFunc)
     {
-        Result<T> Execute(Result<T> result) => result.Compensate(compensatingFunc);
+        var result = await resultTask;
 
-        return resultTask.PipeAsync(Execute);
+        return result.IsSuccess ? Result.Ok(result.Value.Value) : compensatingFunc();
     }
 
     /// <summary>
@@ -223,11 +221,11 @@ public static partial class ResultExtensions
     ///     </item>
     /// </list>
     /// </summary>
-    public static Task<Result> CompensateAsync(this Task<Result> resultTask, Func<Result> compensatingFunc)
+    public static async Task<Result> CompensateAsync(this Task<Result> resultTask, Func<Result> compensatingFunc)
     {
-        Result Execute(Result result) => result.Compensate(compensatingFunc);
+        var result = await resultTask;
 
-        return resultTask.PipeAsync(Execute);
+        return result.IsSuccess ? Result.Ok() : compensatingFunc();
     }
 
     /// <summary>
@@ -241,11 +239,11 @@ public static partial class ResultExtensions
     ///     </item>
     /// </list>
     /// </summary>
-    public static Task<Result<T>> CompensateAsync<T>(this Task<Result<T>> resultTask, Func<IResultError, Result<T>> compensatingFunc)
+    public static async Task<Result<T>> CompensateAsync<T>(this Task<Result<T>> resultTask, Func<IResultError, Result<T>> compensatingFunc)
     {
-        Result<T> Execute(Result<T> result) => result.Compensate(compensatingFunc);
+        var result = await resultTask;
 
-        return resultTask.PipeAsync(Execute);
+        return result.IsSuccess ? Result.Ok(result.Value.Value) : compensatingFunc(result.Error.Value);
     }
 
     /// <summary>
@@ -259,10 +257,10 @@ public static partial class ResultExtensions
     ///     </item>
     /// </list>
     /// </summary>
-    public static Task<Result> CompensateAsync(this Task<Result> resultTask, Func<IResultError, Result> compensatingFunc)
+    public static async Task<Result> CompensateAsync(this Task<Result> resultTask, Func<IResultError, Result> compensatingFunc)
     {
-        Result Execute(Result result) => result.Compensate(compensatingFunc);
+        var result = await resultTask;
 
-        return resultTask.PipeAsync(Execute);
+        return result.IsSuccess ? Result.Ok() : compensatingFunc(result.Error.Value);
     }
 }

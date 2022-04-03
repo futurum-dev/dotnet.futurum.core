@@ -1,5 +1,3 @@
-using Futurum.Core.Functional;
-
 namespace Futurum.Core.Result;
 
 public static partial class ResultEnumerableExtensions
@@ -19,6 +17,10 @@ public static partial class ResultEnumerableExtensions
     /// Transforms an async <see cref="Result"/> <see cref="IEnumerable{T}"/> to an async <see cref="Result"/> <see cref="IEnumerable{TR}"/>
     /// <para>This implicitly understands <see cref="IEnumerable{T}"/></para>
     /// </summary>
-    public static Task<Result<IEnumerable<TR>>> FlatMapAsAsync<T, T1, TR>(this Task<Result<IEnumerable<T>>> resultTask, Func<T, IEnumerable<T1>> selectorFunc, Func<T1, TR> func) =>
-        resultTask.PipeAsync(FlatMapAs, selectorFunc, func);
+    public static async Task<Result<IEnumerable<TR>>> FlatMapAsAsync<T, T1, TR>(this Task<Result<IEnumerable<T>>> resultTask, Func<T, IEnumerable<T1>> selectorFunc, Func<T1, TR> func)
+    {
+        var result = await resultTask;
+
+        return result.FlatMapAs(selectorFunc, func);
+    }
 }

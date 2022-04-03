@@ -1,6 +1,4 @@
-﻿using Futurum.Core.Functional;
-
-namespace Futurum.Core.Result;
+﻿namespace Futurum.Core.Result;
 
 public readonly partial struct Result
 {
@@ -103,11 +101,13 @@ public static partial class ResultExtensions
     /// <para></para>
     /// The original async <see cref="Result{T}" /> is returned unchanged.
     /// </summary>
-    public static Task<Result<T>> DoAsync<T>(this Task<Result<T>> resultTask, Func<T, Task> sideEffect)
+    public static async Task<Result<T>> DoAsync<T>(this Task<Result<T>> resultTask, Func<T, Task> sideEffect)
     {
-        Task<Result<T>> Execute(Result<T> result) => result.DoAsync(sideEffect);
+        var result = await resultTask;
 
-        return resultTask.PipeAsync(Execute);
+        if (result.IsSuccess) await sideEffect(result.Value.Value);
+        
+        return result;
     }
 
     /// <summary>
@@ -123,11 +123,13 @@ public static partial class ResultExtensions
     /// <para></para>
     /// The original async <see cref="Result" /> is returned unchanged.
     /// </summary>
-    public static Task<Result> DoAsync(this Task<Result> resultTask, Func<Task> sideEffect)
+    public static async Task<Result> DoAsync(this Task<Result> resultTask, Func<Task> sideEffect)
     {
-        Task<Result> Execute(Result result) => result.DoAsync(sideEffect);
+        var result = await resultTask;
 
-        return resultTask.PipeAsync(Execute);
+        if (result.IsSuccess) await sideEffect();
+        
+        return result;
     }
 
     /// <summary>
@@ -165,10 +167,12 @@ public static partial class ResultExtensions
     /// <para></para>
     /// The original async <see cref="Result{T}" /> is returned unchanged.
     /// </summary>
-    public static Task<Result> DoAsync(this Task<Result> resultTask, Action sideEffect)
+    public static async Task<Result> DoAsync(this Task<Result> resultTask, Action sideEffect)
     {
-        Result Execute(Result result) => result.Do(sideEffect);
+        var result = await resultTask;
 
-        return resultTask.PipeAsync(Execute);
+        if (result.IsSuccess) sideEffect();
+
+        return result;
     }
 }

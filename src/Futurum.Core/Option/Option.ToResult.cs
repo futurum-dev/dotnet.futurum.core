@@ -1,5 +1,4 @@
-﻿using Futurum.Core.Functional;
-using Futurum.Core.Result;
+﻿using Futurum.Core.Result;
 
 namespace Futurum.Core.Option;
 
@@ -56,13 +55,11 @@ public static partial class OptionExtensions
     ///     </item>
     /// </list>
     /// </summary>
-    public static Task<Result<T>> ToResultAsync<T>(this Task<Option<T>> optionTask, Func<string> errorMessage)
+    public static async Task<Result<T>> ToResultAsync<T>(this Task<Option<T>> optionTask, Func<string> errorMessage)
     {
-        Result<T> HasNoValue() => errorMessage().ToFailResult<T>();
+        var option = await optionTask;
 
-        Result<T> Execute(Option<T> option) => option.Switch(Result.Result.Ok, HasNoValue);
-
-        return optionTask.PipeAsync(Execute);
+        return option.HasValue ? Result.Result.Ok(option.Value) : errorMessage().ToFailResult<T>();
     }
 
     /// <summary>
@@ -80,12 +77,10 @@ public static partial class OptionExtensions
     ///     </item>
     /// </list>
     /// </summary>
-    public static Task<Result<T>> ToResultAsync<T>(this Task<Option<T>> optionTask, Func<IResultError> error)
+    public static async Task<Result<T>> ToResultAsync<T>(this Task<Option<T>> optionTask, Func<IResultError> error)
     {
-        Result<T> HasNoValue() => error().ToFailResult<T>();
+        var option = await optionTask;
 
-        Result<T> Execute(Option<T> option) => option.Switch(Result.Result.Ok, HasNoValue);
-
-        return optionTask.PipeAsync(Execute);
+        return option.HasValue ? Result.Result.Ok(option.Value) : error().ToFailResult<T>();
     }
 }
