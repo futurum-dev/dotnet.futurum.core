@@ -23,6 +23,29 @@ public class ResultEnhanceWithErrorTests
                 {
                     var resultInput = Core.Result.Result.Fail(ErrorMessage1);
 
+                    var result = resultInput.EnhanceWithError(ErrorMessage2);
+
+                    result.ShouldBeFailureWithError(ErrorMessage2, ErrorMessage1);
+                }
+
+                [Fact]
+                public void Success()
+                {
+                    var resultInput = Core.Result.Result.Ok();
+
+                    var result = resultInput.EnhanceWithError(ErrorMessage1);
+
+                    result.ShouldBeSuccess();
+                }
+            }
+
+            public class FuncErrorMessage
+            {
+                [Fact]
+                public void Failure()
+                {
+                    var resultInput = Core.Result.Result.Fail(ErrorMessage1);
+
                     var result = resultInput.EnhanceWithError(() => ErrorMessage2);
 
                     result.ShouldBeFailureWithError(ErrorMessage2, ErrorMessage1);
@@ -40,6 +63,29 @@ public class ResultEnhanceWithErrorTests
             }
 
             public class ResultError
+            {
+                [Fact]
+                public void Failure()
+                {
+                    var resultInput = Core.Result.Result.Fail(ErrorMessage1);
+
+                    var result = resultInput.EnhanceWithError(ErrorMessage2.ToResultError());
+
+                    result.ShouldBeFailureWithError(ErrorMessage2, ErrorMessage1);
+                }
+
+                [Fact]
+                public void Success()
+                {
+                    var resultInput = Core.Result.Result.Ok();
+
+                    var result = resultInput.EnhanceWithError(ErrorMessage1.ToResultError());
+
+                    result.ShouldBeSuccess();
+                }
+            }
+
+            public class FuncResultError
             {
                 [Fact]
                 public void Failure()
@@ -72,6 +118,31 @@ public class ResultEnhanceWithErrorTests
                 {
                     var resultInput = Core.Result.Result.Fail<int>(ErrorMessage1);
 
+                    var result = resultInput.EnhanceWithError(ErrorMessage2);
+
+                    result.ShouldBeFailureWithError(ErrorMessage2, ErrorMessage1);
+                }
+
+                [Fact]
+                public void Success()
+                {
+                    var input = 1;
+
+                    var resultInput = Core.Result.Result.Ok(input);
+
+                    var result = resultInput.EnhanceWithError(ErrorMessage1);
+
+                    result.ShouldBeSuccessWithValue(input);
+                }
+            }
+
+            public class FuncErrorMessage
+            {
+                [Fact]
+                public void Failure()
+                {
+                    var resultInput = Core.Result.Result.Fail<int>(ErrorMessage1);
+
                     var result = resultInput.EnhanceWithError(() => ErrorMessage2);
 
                     result.ShouldBeFailureWithError(ErrorMessage2, ErrorMessage1);
@@ -91,6 +162,31 @@ public class ResultEnhanceWithErrorTests
             }
 
             public class ResultError
+            {
+                [Fact]
+                public void Failure()
+                {
+                    var resultInput = Core.Result.Result.Fail<int>(ErrorMessage1);
+
+                    var result = resultInput.EnhanceWithError(ErrorMessage2.ToResultError());
+
+                    result.ShouldBeFailureWithError(ErrorMessage2, ErrorMessage1);
+                }
+
+                [Fact]
+                public void Success()
+                {
+                    var input = 1;
+
+                    var resultInput = Core.Result.Result.Ok(input);
+
+                    var result = resultInput.EnhanceWithError(ErrorMessage1.ToResultError());
+
+                    result.ShouldBeSuccessWithValue(input);
+                }
+            }
+
+            public class FuncResultError
             {
                 [Fact]
                 public void Failure()
@@ -128,6 +224,29 @@ public class ResultEnhanceWithErrorTests
                 {
                     var resultInput = Core.Result.Result.FailAsync(ErrorMessage1);
 
+                    var result = await resultInput.EnhanceWithErrorAsync(ErrorMessage2);
+
+                    result.ShouldBeFailureWithError(ErrorMessage2, ErrorMessage1);
+                }
+
+                [Fact]
+                public async Task Success()
+                {
+                    var resultInput = Core.Result.Result.OkAsync();
+
+                    var result = await resultInput.EnhanceWithErrorAsync(ErrorMessage1);
+
+                    result.ShouldBeSuccess();
+                }
+            }
+
+            public class FuncErrorMessage
+            {
+                [Fact]
+                public async Task Failure()
+                {
+                    var resultInput = Core.Result.Result.FailAsync(ErrorMessage1);
+
                     var result = await resultInput.EnhanceWithErrorAsync(() => ErrorMessage2);
 
                     result.ShouldBeFailureWithError(ErrorMessage2, ErrorMessage1);
@@ -145,6 +264,29 @@ public class ResultEnhanceWithErrorTests
             }
 
             public class ResultError
+            {
+                [Fact]
+                public async Task Failure()
+                {
+                    var resultInput = Core.Result.Result.FailAsync(ErrorMessage1);
+
+                    var result = await resultInput.EnhanceWithErrorAsync(ErrorMessage2.ToResultError());
+
+                    result.ShouldBeFailureWithError(ErrorMessage2, ErrorMessage1);
+                }
+
+                [Fact]
+                public async Task Success()
+                {
+                    var resultInput = Core.Result.Result.OkAsync();
+
+                    var result = await resultInput.EnhanceWithErrorAsync(ErrorMessage1.ToResultError());
+
+                    result.ShouldBeSuccess();
+                }
+            }
+
+            public class FuncResultError
             {
                 [Fact]
                 public async Task Failure()
@@ -177,6 +319,31 @@ public class ResultEnhanceWithErrorTests
                 {
                     var resultInput = Core.Result.Result.FailAsync<int>(ErrorMessage1);
 
+                    var result = await resultInput.EnhanceWithErrorAsync(ErrorMessage2);
+
+                    result.ShouldBeFailureWithError(ErrorMessage2, ErrorMessage1);
+                }
+
+                [Fact]
+                public async Task Success()
+                {
+                    var input = 1;
+
+                    var resultInput = Core.Result.Result.OkAsync(input);
+
+                    var result = await resultInput.EnhanceWithErrorAsync(ErrorMessage1);
+
+                    result.ShouldBeSuccessWithValue(input);
+                }
+            }
+
+            public class FuncErrorMessage
+            {
+                [Fact]
+                public async Task Failure()
+                {
+                    var resultInput = Core.Result.Result.FailAsync<int>(ErrorMessage1);
+
                     var result = await resultInput.EnhanceWithErrorAsync(() => ErrorMessage2);
 
                     result.ShouldBeFailureWithError(ErrorMessage2, ErrorMessage1);
@@ -196,6 +363,31 @@ public class ResultEnhanceWithErrorTests
             }
 
             public class ResultError
+            {
+                [Fact]
+                public async Task Failure()
+                {
+                    var resultInput = Core.Result.Result.FailAsync<int>(ErrorMessage1);
+
+                    var result = await resultInput.EnhanceWithErrorAsync(ErrorMessage2.ToResultError());
+
+                    result.ShouldBeFailureWithError(ErrorMessage2, ErrorMessage1);
+                }
+
+                [Fact]
+                public async Task Success()
+                {
+                    var input = 1;
+
+                    var resultInput = Core.Result.Result.OkAsync(input);
+
+                    var result = await resultInput.EnhanceWithErrorAsync(ErrorMessage1.ToResultError());
+
+                    result.ShouldBeSuccessWithValue(input);
+                }
+            }
+
+            public class FuncResultError
             {
                 [Fact]
                 public async Task Failure()

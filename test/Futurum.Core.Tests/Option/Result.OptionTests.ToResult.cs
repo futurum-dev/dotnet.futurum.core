@@ -23,6 +23,31 @@ public class ResultOptionExtensionsToResultTests
                 string value = null;
                 var option = value.ToOption().ToResultOk();
 
+                var result = option.ToResult(ErrorMessage);
+
+                result.ShouldBeFailureWithError(ErrorMessage);
+            }
+
+            [Fact]
+            public void HasValue()
+            {
+                var value = Guid.NewGuid();
+                var option = value.ToOption().ToResultOk();
+
+                var result = option.ToResult(ErrorMessage);
+
+                result.ShouldBeSuccessWithValue(value);
+            }
+        }
+
+        public class FuncStringErrorMessage
+        {
+            [Fact]
+            public void HasNoValue()
+            {
+                string value = null;
+                var option = value.ToOption().ToResultOk();
+
                 var result = option.ToResult(() => ErrorMessage);
 
                 result.ShouldBeFailureWithError(ErrorMessage);
@@ -41,6 +66,31 @@ public class ResultOptionExtensionsToResultTests
         }
 
         public class IResultError
+        {
+            [Fact]
+            public void HasNoValue()
+            {
+                string value = null;
+                var option = value.ToOption().ToResultOk();
+
+                var result = option.ToResult(ErrorMessage.ToResultError());
+
+                result.ShouldBeFailureWithError(ErrorMessage);
+            }
+
+            [Fact]
+            public void HasValue()
+            {
+                var value = Guid.NewGuid();
+                var option = value.ToOption().ToResultOk();
+
+                var result = option.ToResult(ErrorMessage.ToResultError());
+
+                result.ShouldBeSuccessWithValue(value);
+            }
+        }
+
+        public class FuncIResultError
         {
             [Fact]
             public void HasNoValue()
@@ -76,6 +126,31 @@ public class ResultOptionExtensionsToResultTests
                 string value = null;
                 var option = value.ToOption().ToResultOkAsync();
 
+                var result = await option.ToResultAsync(ErrorMessage);
+
+                result.ShouldBeFailureWithError(ErrorMessage);
+            }
+
+            [Fact]
+            public async Task HasValue()
+            {
+                var value = Guid.NewGuid();
+                var option = value.ToOption().ToResultOkAsync();
+
+                var result = await option.ToResultAsync(ErrorMessage);
+
+                result.ShouldBeSuccessWithValue(value);
+            }
+        }
+
+        public class FuncStringErrorMessage
+        {
+            [Fact]
+            public async Task HasNoValue()
+            {
+                string value = null;
+                var option = value.ToOption().ToResultOkAsync();
+
                 var result = await option.ToResultAsync(() => ErrorMessage);
 
                 result.ShouldBeFailureWithError(ErrorMessage);
@@ -94,6 +169,31 @@ public class ResultOptionExtensionsToResultTests
         }
 
         public class IResultError
+        {
+            [Fact]
+            public async Task HasNoValue()
+            {
+                string value = null;
+                var option = value.ToOption().ToResultOkAsync();
+
+                var result = await option.ToResultAsync(ErrorMessage.ToResultError());
+
+                result.ShouldBeFailureWithError(ErrorMessage);
+            }
+
+            [Fact]
+            public async Task HasValue()
+            {
+                var value = Guid.NewGuid();
+                var option = value.ToOption().ToResultOkAsync();
+
+                var result = await option.ToResultAsync(ErrorMessage.ToResultError());
+
+                result.ShouldBeSuccessWithValue(value);
+            }
+        }
+
+        public class FuncIResultError
         {
             [Fact]
             public async Task HasNoValue()

@@ -38,6 +38,25 @@ public static partial class OptionExtensions
     ///     </item>
     /// </list>
     /// </summary>
+    public static Result<TResult> TryCast<TResult>(this object? value, string errorMessage)
+        where TResult : class =>
+        TryCast<TResult>(value).ToResult(errorMessage);
+
+    /// <summary>
+    /// Tries to cast <paramref name="value"/> as <typeparamref name="TResult"/>
+    /// <list type="bullet">
+    ///     <item>
+    ///         <description>
+    ///         If the cast is successful (is not null), the cast result is returned as a <see cref="Result{T}"/> with <see cref="Result{T}.IsSuccess"/> true.
+    ///         </description>
+    ///     </item>
+    ///     <item>
+    ///         <description>
+    ///         If the cast is not successful (is null), then as a <see cref="Result{T}"/> with <see cref="Result{T}.IsFailure"/> true.
+    ///         </description>
+    ///     </item>
+    /// </list>
+    /// </summary>
     public static Result<TResult> TryCast<TResult>(this object? value, Func<string> errorMessage)
         where TResult : class =>
         TryCast<TResult>(value).ToResult(errorMessage);

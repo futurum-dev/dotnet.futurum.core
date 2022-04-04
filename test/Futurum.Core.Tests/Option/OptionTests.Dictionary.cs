@@ -45,6 +45,31 @@ public class OptionDictionaryExtensionsTests
                 var values = Enumerable.Range(0, 10)
                                        .ToDictionary(x => x, x => x);
 
+                var option = values.TryGetValue(100, ErrorMessage);
+
+                option.ShouldBeFailureWithError(ErrorMessage);
+            }
+
+            [Fact]
+            public void HasValue()
+            {
+                var values = Enumerable.Range(0, 10)
+                                       .ToDictionary(x => x, x => x);
+
+                var option = values.TryGetValue(2, ErrorMessage);
+
+                option.ShouldBeSuccessWithValue(2);
+            }
+        }
+        
+        public class FuncAsResult
+        {
+            [Fact]
+            public void HasNoValue()
+            {
+                var values = Enumerable.Range(0, 10)
+                                       .ToDictionary(x => x, x => x);
+
                 var option = values.TryGetValue(100, () => ErrorMessage);
 
                 option.ShouldBeFailureWithError(ErrorMessage);
@@ -88,6 +113,31 @@ public class OptionDictionaryExtensionsTests
         }
 
         public class AsResult
+        {
+            [Fact]
+            public void HasNoValue()
+            {
+                var values = new ReadOnlyDictionary<int, int>(Enumerable.Range(0, 10)
+                                                                        .ToDictionary(x => x, x => x));
+
+                var option = values.TryGetValue(100, ErrorMessage);
+
+                option.ShouldBeFailureWithError(ErrorMessage);
+            }
+
+            [Fact]
+            public void HasValue()
+            {
+                var values = new ReadOnlyDictionary<int, int>(Enumerable.Range(0, 10)
+                                                                        .ToDictionary(x => x, x => x));
+
+                var option = values.TryGetValue(2, ErrorMessage);
+
+                option.ShouldBeSuccessWithValue(2);
+            }
+        }
+
+        public class FuncAsResult
         {
             [Fact]
             public void HasNoValue()
