@@ -45,6 +45,35 @@ public class OptionExtensionsTryCastTests
 
             object nameAsObject = name;
         
+            var option = nameAsObject.TryCast<string>(ErrorMessage);
+        
+            option.ShouldBeSuccessWithValue(name);
+        }
+    
+        [Fact]
+        public void failure()
+        {
+            var name = 10;
+
+            object nameAsObject = name;
+        
+            var option = nameAsObject.TryCast<string>(ErrorMessage);
+        
+            option.ShouldBeFailureWithError(ErrorMessage);
+        }
+    }
+    
+    public class FuncAsResult
+    {
+        private const string ErrorMessage = "ERROR_MESSAGE";
+
+        [Fact]
+        public void success()
+        {
+            var name = Guid.NewGuid().ToString();
+
+            object nameAsObject = name;
+        
             var option = nameAsObject.TryCast<string>(() => ErrorMessage);
         
             option.ShouldBeSuccessWithValue(name);
