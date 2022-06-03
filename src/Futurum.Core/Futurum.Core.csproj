@@ -19,6 +19,7 @@
 
     <ItemGroup>
       <PackageReference Include="System.Linq.Async" Version="6.0.1" />
+      <PackageReference Update="MinVer" Version="4.0.0" />
     </ItemGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
