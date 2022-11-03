@@ -166,6 +166,16 @@ public static class FluentAssertionResultExtensions
     /// <summary>
     /// Specifies that the <see cref="Futurum.Core.Result.Result"/> should be <see cref="Futurum.Core.Result.Result.IsFailure"/> true with <paramref name="errorMessages"/>.
     /// </summary>
+    public static void ShouldBeFailureWithErrorSafe(this Core.Result.Result result, params string[] errorMessages)
+    {
+        result.ShouldBeFailure();
+
+        result.Error.Map(ResultErrorStringExtensions.ToErrorStringSafe).Should().Be(string.Join(";", errorMessages));
+    }
+
+    /// <summary>
+    /// Specifies that the <see cref="Futurum.Core.Result.Result"/> should be <see cref="Futurum.Core.Result.Result.IsFailure"/> true with <paramref name="errorMessages"/>.
+    /// </summary>
     public static void ShouldBeFailureWithError(this Core.Result.Result result, params string[] errorMessages)
     {
         result.ShouldBeFailure();
@@ -181,6 +191,15 @@ public static class FluentAssertionResultExtensions
         result.IsFailure.Should().BeTrue();
     }
 
+    /// <summary>
+    /// Specifies that the <see cref="Futurum.Core.Result.Result{T}"/> should be <see cref="Futurum.Core.Result.Result{T}.IsFailure"/> true with <paramref name="errorMessages"/>.
+    /// </summary>
+    public static void ShouldBeFailureWithErrorSafe<T>(this Result<T> result, params string[] errorMessages)
+    {
+        result.ShouldBeFailure();
+
+        result.Error.Map(ResultErrorStringExtensions.ToErrorStringSafe).Should().Be(string.Join(";", errorMessages));
+    }
     /// <summary>
     /// Specifies that the <see cref="Futurum.Core.Result.Result{T}"/> should be <see cref="Futurum.Core.Result.Result{T}.IsFailure"/> true with <paramref name="errorMessages"/>.
     /// </summary>

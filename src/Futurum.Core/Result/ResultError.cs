@@ -8,7 +8,12 @@ namespace Futurum.Core.Result;
 public interface IResultError
 {
     /// <summary>
-    /// Get Error as <see cref="ResultErrorStructure"/> 
+    /// Get Error as <see cref="ResultErrorStructure"/>. Sensitive information (e.g. StackTraces) are not included 
+    /// </summary>
+    ResultErrorStructure GetErrorStructureSafe();
+    
+    /// <summary>
+    /// Get Error as <see cref="ResultErrorStructure"/>
     /// </summary>
     ResultErrorStructure GetErrorStructure();
 }
@@ -19,7 +24,12 @@ public interface IResultError
 public interface IResultErrorNonComposite : IResultError
 {
     /// <summary>
-    /// Get Error as <see cref="string"/> 
+    /// Get Error as <see cref="string"/>. Sensitive information (e.g. StackTraces) are not included
+    /// </summary>
+    string GetErrorStringSafe();
+    
+    /// <summary>
+    /// Get Error as <see cref="string"/>
     /// </summary>
     string GetErrorString();
 }
@@ -30,7 +40,12 @@ public interface IResultErrorNonComposite : IResultError
 public interface IResultErrorComposite : IResultError
 {
     /// <summary>
-    /// Get Error as <see cref="string"/> 
+    /// Get Error as <see cref="string"/>. Sensitive information (e.g. StackTraces) are not included
+    /// </summary>
+    string GetErrorStringSafe(string seperator);
+    
+    /// <summary>
+    /// Get Error as <see cref="string"/>
     /// </summary>
     string GetErrorString(string seperator);
     

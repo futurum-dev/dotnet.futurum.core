@@ -25,7 +25,7 @@ public class ResultTryTests
                     Action action = () => throw new Exception(ErrorMessage1);
                     var result = Core.Result.Result.Try(action, ErrorMessage2);
 
-                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithErrorSafe($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -46,7 +46,7 @@ public class ResultTryTests
                     Action action = () => throw new Exception(ErrorMessage1);
                     var result = Core.Result.Result.Try(action, () => ErrorMessage2);
 
-                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithErrorSafe($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -67,7 +67,7 @@ public class ResultTryTests
                     Action action = () => throw new Exception(ErrorMessage1);
                     var result = Core.Result.Result.Try(action, ErrorMessage2.ToResultError());
 
-                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithErrorSafe($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -88,7 +88,7 @@ public class ResultTryTests
                     Action action = () => throw new Exception(ErrorMessage1);
                     var result = Core.Result.Result.Try(action, () => ErrorMessage2.ToResultError());
 
-                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithErrorSafe($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -119,7 +119,7 @@ public class ResultTryTests
                                                         },
                                                         ErrorMessage2);
 
-                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithErrorSafe($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -149,7 +149,7 @@ public class ResultTryTests
                                                         },
                                                         () => ErrorMessage2);
 
-                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithErrorSafe($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -179,7 +179,7 @@ public class ResultTryTests
                                                         },
                                                         ErrorMessage2.ToResultError());
 
-                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithErrorSafe($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -209,7 +209,7 @@ public class ResultTryTests
                                                         },
                                                         () => ErrorMessage2.ToResultError());
 
-                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithErrorSafe($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -240,7 +240,7 @@ public class ResultTryTests
                                                         },
                                                         ErrorMessage2);
 
-                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithErrorSafe($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -275,7 +275,7 @@ public class ResultTryTests
                                                         },
                                                         () => ErrorMessage2);
 
-                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithErrorSafe($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -310,7 +310,7 @@ public class ResultTryTests
                                                         },
                                                         ErrorMessage2.ToResultError());
 
-                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithErrorSafe($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -345,7 +345,7 @@ public class ResultTryTests
                                                         },
                                                         () => ErrorMessage2.ToResultError());
 
-                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithErrorSafe($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -385,7 +385,7 @@ public class ResultTryTests
                                                         },
                                                         ErrorMessage2);
 
-                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithErrorSafe($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -424,7 +424,7 @@ public class ResultTryTests
                                                         },
                                                         () => ErrorMessage2);
 
-                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithErrorSafe($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -463,7 +463,7 @@ public class ResultTryTests
                                                         },
                                                         ErrorMessage2.ToResultError());
 
-                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithErrorSafe($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -502,7 +502,7 @@ public class ResultTryTests
                                                         },
                                                         () => ErrorMessage2.ToResultError());
 
-                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithErrorSafe($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -540,7 +540,7 @@ public class ResultTryTests
                     Func<Task> func = () => throw new Exception(ErrorMessage1);
                     var result = await Core.Result.Result.TryAsync(func, ErrorMessage2);
 
-                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithErrorSafe($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -561,7 +561,7 @@ public class ResultTryTests
                     Func<Task> func = () => throw new Exception(ErrorMessage1);
                     var result = await Core.Result.Result.TryAsync(func, () => ErrorMessage2);
 
-                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithErrorSafe($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -582,7 +582,7 @@ public class ResultTryTests
                     Func<Task> func = () => throw new Exception(ErrorMessage1);
                     var result = await Core.Result.Result.TryAsync(func, ErrorMessage2.ToResultError());
 
-                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithErrorSafe($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -603,7 +603,7 @@ public class ResultTryTests
                     Func<Task> func = () => throw new Exception(ErrorMessage1);
                     var result = await Core.Result.Result.TryAsync(func, () => ErrorMessage2.ToResultError());
 
-                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithErrorSafe($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -634,7 +634,7 @@ public class ResultTryTests
                                                                    },
                                                                    ErrorMessage2);
 
-                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithErrorSafe($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -664,7 +664,7 @@ public class ResultTryTests
                                                                    },
                                                                    () => ErrorMessage2);
 
-                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithErrorSafe($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -694,7 +694,7 @@ public class ResultTryTests
                                                                    },
                                                                    ErrorMessage2.ToResultError());
 
-                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithErrorSafe($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -724,7 +724,7 @@ public class ResultTryTests
                                                                    },
                                                                    () => ErrorMessage2.ToResultError());
 
-                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithErrorSafe($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -757,7 +757,7 @@ public class ResultTryTests
                                                                    },
                                                                    ErrorMessage2);
 
-                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithErrorSafe($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -787,7 +787,7 @@ public class ResultTryTests
                                                                    },
                                                                    () => ErrorMessage2);
 
-                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithErrorSafe($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -817,7 +817,7 @@ public class ResultTryTests
                                                                    },
                                                                    ErrorMessage2.ToResultError());
 
-                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithErrorSafe($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -847,7 +847,7 @@ public class ResultTryTests
                                                                    },
                                                                    () => ErrorMessage2.ToResultError());
 
-                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithErrorSafe($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -878,7 +878,7 @@ public class ResultTryTests
                                                                    },
                                                                    ErrorMessage2);
 
-                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithErrorSafe($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -913,7 +913,7 @@ public class ResultTryTests
                                                                    },
                                                                    () => ErrorMessage2);
 
-                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithErrorSafe($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -948,7 +948,7 @@ public class ResultTryTests
                                                                    },
                                                                    ErrorMessage2.ToResultError());
 
-                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithErrorSafe($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -983,7 +983,7 @@ public class ResultTryTests
                                                                    },
                                                                    () => ErrorMessage2.ToResultError());
 
-                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithErrorSafe($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -1023,7 +1023,7 @@ public class ResultTryTests
                                                                    },
                                                                    ErrorMessage2);
 
-                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithErrorSafe($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -1062,7 +1062,7 @@ public class ResultTryTests
                                                                    },
                                                                    () => ErrorMessage2);
 
-                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithErrorSafe($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -1101,7 +1101,7 @@ public class ResultTryTests
                                                                    },
                                                                    ErrorMessage2.ToResultError());
 
-                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithErrorSafe($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -1140,7 +1140,7 @@ public class ResultTryTests
                                                                    },
                                                                    () => ErrorMessage2.ToResultError());
 
-                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
+                    result.ShouldBeFailureWithErrorSafe($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]

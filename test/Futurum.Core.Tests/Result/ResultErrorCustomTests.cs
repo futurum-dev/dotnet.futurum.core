@@ -20,11 +20,29 @@ public class ResultErrorCustomTests
             _message = message;
         }
 
-        public string GetErrorString() =>
+        public string GetErrorStringSafe() =>
             _message;
 
-        public ResultErrorStructure GetErrorStructure() =>
+        public string GetErrorString() =>
+            GetErrorStringSafe();
+
+        public ResultErrorStructure GetErrorStructureSafe() =>
             new(_message, Enumerable.Empty<ResultErrorStructure>());
+
+        public ResultErrorStructure GetErrorStructure() =>
+            GetErrorStructureSafe();
+    }
+
+    [Fact]
+    public void ToErrorStringSafe()
+    {
+        var errorMessage = Guid.NewGuid().ToString();
+
+        var resultError = new TestResultError(errorMessage);
+
+        var errorString = resultError.ToErrorStringSafe(",");
+
+        errorString.Should().Be(errorMessage);
     }
 
     [Fact]
@@ -37,6 +55,19 @@ public class ResultErrorCustomTests
         var errorString = resultError.ToErrorString(",");
 
         errorString.Should().Be(errorMessage);
+    }
+
+    [Fact]
+    public void ToErrorStructureSafe()
+    {
+        var errorMessage = Guid.NewGuid().ToString();
+
+        var resultError = new TestResultError(errorMessage);
+
+        var errorStructure = resultError.ToErrorStructureSafe();
+
+        errorStructure.Message.Should().Be(errorMessage);
+        errorStructure.Children.Should().BeEmpty();
     }
 
     [Fact]

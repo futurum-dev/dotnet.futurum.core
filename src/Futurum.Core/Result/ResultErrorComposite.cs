@@ -29,6 +29,24 @@ public class ResultErrorComposite : IResultErrorComposite
     public IEnumerable<IResultError> Children { get; }
 
     /// <inheritdoc />
+    public string GetErrorStringSafe(string seperator)
+    {
+        string Transform(IResultError resultError) =>
+            resultError.ToErrorStringSafe(seperator);
+
+        string GetChildrenErrorString() =>
+            Children.Select(Transform)
+                    .StringJoin(seperator);
+
+        string GetParentErrorString() =>
+            Parent.Value.GetErrorStringSafe();
+
+        return Parent.HasValue
+            ? $"{GetParentErrorString()}{seperator}{GetChildrenErrorString()}"
+            : GetChildrenErrorString();
+    }
+
+    /// <inheritdoc />
     public string GetErrorString(string seperator)
     {
         string Transform(IResultError resultError) =>
@@ -45,6 +63,12 @@ public class ResultErrorComposite : IResultErrorComposite
             ? $"{GetParentErrorString()}{seperator}{GetChildrenErrorString()}"
             : GetChildrenErrorString();
     }
+
+    /// <inheritdoc />
+    public ResultErrorStructure GetErrorStructureSafe() =>
+        Parent.HasValue
+            ? ResultErrorStructureExtensions.ToResultErrorStructure(Parent.Value.GetErrorStringSafe(), Children.Select(ResultErrorStructureExtensions.ToErrorStructureSafe))
+            : ResultErrorStructureExtensions.ToResultErrorStructure(Children.Select(ResultErrorStructureExtensions.ToErrorStructureSafe));
 
     /// <inheritdoc />
     public ResultErrorStructure GetErrorStructure() =>

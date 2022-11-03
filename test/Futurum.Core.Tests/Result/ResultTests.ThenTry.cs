@@ -64,7 +64,7 @@ public class ResultThenTryTests
                                                            },
                                                            () => ErrorMessage3);
 
-                    resultOutput.ShouldBeFailureWithError($"{ErrorMessage3};{ErrorMessage1}");
+                    resultOutput.ShouldBeFailureWithErrorSafe($"{ErrorMessage3};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -132,7 +132,7 @@ public class ResultThenTryTests
                                                            () => ErrorMessage3);
 
                     passedValue.Should().Be(inputValue);
-                    resultOutput.ShouldBeFailureWithError($"{ErrorMessage3};{ErrorMessage1}");
+                    resultOutput.ShouldBeFailureWithErrorSafe($"{ErrorMessage3};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -204,7 +204,7 @@ public class ResultThenTryTests
                                                            _ => ErrorMessage3);
 
                     passedValue.Should().Be(inputValue);
-                    resultOutput.ShouldBeFailureWithError($"{ErrorMessage3};{ErrorMessage1}");
+                    resultOutput.ShouldBeFailureWithErrorSafe($"{ErrorMessage3};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -278,7 +278,7 @@ public class ResultThenTryTests
                                                                       },
                                                                       () => ErrorMessage3);
 
-                    resultOutput.ShouldBeFailureWithError($"{ErrorMessage3};{ErrorMessage1}");
+                    resultOutput.ShouldBeFailureWithErrorSafe($"{ErrorMessage3};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -348,7 +348,7 @@ public class ResultThenTryTests
                                                                       () => ErrorMessage3);
 
                     passedValue.Should().Be(inputValue);
-                    resultOutput.ShouldBeFailureWithError($"{ErrorMessage3};{ErrorMessage1}");
+                    resultOutput.ShouldBeFailureWithErrorSafe($"{ErrorMessage3};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -425,7 +425,7 @@ public class ResultThenTryTests
                                                                       },
                                                                       () => ErrorMessage3);
 
-                    resultOutput.ShouldBeFailureWithError($"{ErrorMessage3};{ErrorMessage1}");
+                    resultOutput.ShouldBeFailureWithErrorSafe($"{ErrorMessage3};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -493,7 +493,7 @@ public class ResultThenTryTests
                                                                       () => ErrorMessage3);
 
                     passedValue.Should().Be(inputValue);
-                    resultOutput.ShouldBeFailureWithError($"{ErrorMessage3};{ErrorMessage1}");
+                    resultOutput.ShouldBeFailureWithErrorSafe($"{ErrorMessage3};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -569,7 +569,7 @@ public class ResultThenTryTests
                                                                       },
                                                                       () => ErrorMessage3);
 
-                    resultOutput.ShouldBeFailureWithError($"{ErrorMessage3};{ErrorMessage1}");
+                    resultOutput.ShouldBeFailureWithErrorSafe($"{ErrorMessage3};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -639,7 +639,7 @@ public class ResultThenTryTests
                                                                       () => ErrorMessage3);
 
                     passedValue.Should().Be(inputValue);
-                    resultOutput.ShouldBeFailureWithError($"{ErrorMessage3};{ErrorMessage1}");
+                    resultOutput.ShouldBeFailureWithErrorSafe($"{ErrorMessage3};{ErrorMessage1}");
                 }
 
                 [Fact]

@@ -15,12 +15,20 @@ public class ResultErrorKeyNotFound : IResultErrorNonComposite
     }
 
     /// <inheritdoc />
-    public string GetErrorString() =>
+    public string GetErrorStringSafe() =>
         $"Unable to find key : '{_key}' in source : '{_sourceDescription}'";
 
     /// <inheritdoc />
+    public string GetErrorString() =>
+        GetErrorStringSafe();
+
+    /// <inheritdoc />
+    public ResultErrorStructure GetErrorStructureSafe() =>
+        new(GetErrorStringSafe(), Enumerable.Empty<ResultErrorStructure>());
+
+    /// <inheritdoc />
     public ResultErrorStructure GetErrorStructure() =>
-        new(GetErrorString(), Enumerable.Empty<ResultErrorStructure>());
+        GetErrorStructureSafe();
 
     /// <summary>
     /// Create a <see cref="ResultErrorKeyNotFound"/> 
