@@ -6,6 +6,16 @@ namespace Futurum.Core.Result;
 public static class ResultErrorStructureExtensions
 {
     /// <summary>
+    /// Transforms an <see cref="IResultError"/> into a <see cref="ResultErrorStructure"/>. Sensitive information (e.g. StackTraces) are not included
+    /// </summary>
+    public static ResultErrorStructure ToErrorStructureSafe(this IResultError resultError) =>
+        resultError switch
+        {
+            null => CreateEmptyResultErrorStructure(),
+            _    => resultError.GetErrorStructureSafe()
+        };
+
+    /// <summary>
     /// Transforms an <see cref="IResultError"/> into a <see cref="ResultErrorStructure"/>
     /// </summary>
     public static ResultErrorStructure ToErrorStructure(this IResultError resultError) =>

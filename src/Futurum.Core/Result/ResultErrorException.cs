@@ -13,10 +13,18 @@ public class ResultErrorException : IResultErrorNonComposite
     public Exception Exception { get; }
 
     /// <inheritdoc />
-    public string GetErrorString() =>
+    public string GetErrorStringSafe() =>
         Exception.Message;
 
     /// <inheritdoc />
-    public ResultErrorStructure GetErrorStructure() =>
+    public string GetErrorString() =>
+        Exception.ToString();
+
+    /// <inheritdoc />
+    public ResultErrorStructure GetErrorStructureSafe() =>
         Exception.Message.ToResultErrorStructure();
+
+    /// <inheritdoc />
+    public ResultErrorStructure GetErrorStructure() =>
+        Exception.ToString().ToResultErrorStructure();
 }

@@ -9,10 +9,16 @@ public class ResultErrorEmpty : IResultErrorNonComposite
     }
 
     /// <inheritdoc />
-    public string GetErrorString() =>
+    public string GetErrorStringSafe() =>
         string.Empty;
 
+    public string GetErrorString() =>
+        GetErrorStringSafe();
+
     /// <inheritdoc />
-    public ResultErrorStructure GetErrorStructure() =>
+    public ResultErrorStructure GetErrorStructureSafe() =>
         ResultErrorStructureExtensions.CreateEmptyResultErrorStructure();
+
+    public ResultErrorStructure GetErrorStructure() =>
+        GetErrorStructureSafe();
 }

@@ -39,7 +39,7 @@ public class ResultDoWhenFailureTests
                         });
 
                         wasCalled.Should().BeTrue();
-                        passedResultError.ToErrorString().Should().Be(ErrorMessage);
+                        passedResultError.ToErrorStringSafe().Should().Be(ErrorMessage);
                         returnedResult.ShouldBeFailureWithError(ErrorMessage);
                     }
 
@@ -76,7 +76,7 @@ public class ResultDoWhenFailureTests
                         });
 
                         wasCalled.Should().BeTrue();
-                        passedResultError.ToErrorString().Should().Be(ErrorMessage);
+                        passedResultError.ToErrorStringSafe().Should().Be(ErrorMessage);
                         resultOutput.ShouldBeFailureWithError(ErrorMessage);
                     }
 
@@ -186,7 +186,7 @@ public class ResultDoWhenFailureTests
                         });
 
                         wasCalled.Should().BeTrue();
-                        passedResultError.ToErrorString().Should().Be(ErrorMessage);
+                        passedResultError.ToErrorStringSafe().Should().Be(ErrorMessage);
                         returnedResult.ShouldBeFailureWithError(ErrorMessage);
                     }
 
@@ -230,7 +230,7 @@ public class ResultDoWhenFailureTests
                         });
 
                         wasCalled.Should().BeTrue();
-                        passedResultError.ToErrorString().Should().Be(ErrorMessage);
+                        passedResultError.ToErrorStringSafe().Should().Be(ErrorMessage);
                         resultOutput.ShouldBeFailureWithError(ErrorMessage);
                     }
 
@@ -366,7 +366,7 @@ public class ResultDoWhenFailureTests
                         });
 
                         wasCalled.Should().BeTrue();
-                        passedResultError.ToErrorString().Should().Be(ErrorMessage);
+                        passedResultError.ToErrorStringSafe().Should().Be(ErrorMessage);
                         returnedResult.ShouldBeFailureWithError(ErrorMessage);
                     }
 
@@ -403,7 +403,7 @@ public class ResultDoWhenFailureTests
                         });
 
                         wasCalled.Should().BeTrue();
-                        passedResultError.ToErrorString().Should().Be(ErrorMessage);
+                        passedResultError.ToErrorStringSafe().Should().Be(ErrorMessage);
                         resultOutput.ShouldBeFailureWithError(ErrorMessage);
                     }
 
@@ -513,7 +513,7 @@ public class ResultDoWhenFailureTests
                         });
 
                         wasCalled.Should().BeTrue();
-                        passedResultError.ToErrorString().Should().Be(ErrorMessage);
+                        passedResultError.ToErrorStringSafe().Should().Be(ErrorMessage);
                         returnedResult.ShouldBeFailureWithError(ErrorMessage);
                     }
 
@@ -557,7 +557,7 @@ public class ResultDoWhenFailureTests
                         });
 
                         wasCalled.Should().BeTrue();
-                        passedResultError.ToErrorString().Should().Be(ErrorMessage);
+                        passedResultError.ToErrorStringSafe().Should().Be(ErrorMessage);
                         resultOutput.ShouldBeFailureWithError(ErrorMessage);
                     }
 
