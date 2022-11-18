@@ -394,7 +394,7 @@ public class ResultTryTests
                     var result = Core.Result.Result.Try(() => Core.Result.Result.Fail<int>(ErrorMessage1),
                                                         ErrorMessage2);
 
-                    result.ShouldBeFailureWithError(ErrorMessage1);
+                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -433,7 +433,7 @@ public class ResultTryTests
                     var result = Core.Result.Result.Try(() => Core.Result.Result.Fail<int>(ErrorMessage1),
                                                         () => ErrorMessage2);
 
-                    result.ShouldBeFailureWithError(ErrorMessage1);
+                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -472,7 +472,7 @@ public class ResultTryTests
                     var result = Core.Result.Result.Try(() => Core.Result.Result.Fail<int>(ErrorMessage1),
                                                         ErrorMessage2.ToResultError());
 
-                    result.ShouldBeFailureWithError(ErrorMessage1);
+                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]
@@ -511,7 +511,7 @@ public class ResultTryTests
                     var result = Core.Result.Result.Try(() => Core.Result.Result.Fail<int>(ErrorMessage1),
                                                         () => ErrorMessage2.ToResultError());
 
-                    result.ShouldBeFailureWithError(ErrorMessage1);
+                    result.ShouldBeFailureWithError($"{ErrorMessage2};{ErrorMessage1}");
                 }
 
                 [Fact]

@@ -319,7 +319,7 @@ public readonly partial struct Result
         {
             var result = func();
 
-            return result;
+            return result.EnhanceWithError(errorMessage);
         }
         catch (Exception exception)
         {
@@ -344,7 +344,7 @@ public readonly partial struct Result
         {
             var result = func();
 
-            return result;
+            return result.EnhanceWithError(errorMessage);
         }
         catch (Exception exception)
         {
@@ -369,7 +369,7 @@ public readonly partial struct Result
         {
             var result = func();
 
-            return result;
+            return result.EnhanceWithError(error);
         }
         catch (Exception exception)
         {
@@ -394,7 +394,7 @@ public readonly partial struct Result
         {
             var result = func();
 
-            return result;
+            return result.EnhanceWithError(error);
         }
         catch (Exception exception)
         {
