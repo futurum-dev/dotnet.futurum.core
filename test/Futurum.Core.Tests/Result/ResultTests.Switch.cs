@@ -245,15 +245,15 @@ public class ResultSwitchTests
                     }
 
                     [Fact]
-                    public void SuccessInput()
+                    public async Task SuccessInput()
                     {
                         var trueValue = Guid.NewGuid();
                         var falseValue = Guid.NewGuid();
 
                         var resultInput = Core.Result.Result.Ok();
 
-                        var returnValue = resultInput.Switch(() => trueValue,
-                                                             _ => falseValue);
+                        var returnValue = await resultInput.SwitchAsync(() => Task.FromResult(trueValue),
+                                                                        _ => Task.FromResult(falseValue));
 
                         returnValue.Should().Be(trueValue);
                     }
