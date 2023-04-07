@@ -246,6 +246,9 @@ If none of the elements in the sequence match are *failure*, then a Result *fail
 ##### ThenAs
 Transforms an Result&lt;IEnumerable&gt;T&gt;&gt; to a Result&lt;IEnumerable&gt;TR&gt;&gt;
 
+##### TryFirst
+Sequentially runs through a sequence of elements applying a function that returns a Result&lt;TR&gt;. The first one that is *success* is returned.
+
 ##### TryToDictionary
 Try to create a Dictionary&lt;TKey, TElement;&gt; from an IEnumerable&gt;T&gt; according to specified key selector and element selector functions.
 
