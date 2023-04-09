@@ -3,6 +3,7 @@ using System.Linq;
 using FluentAssertions;
 
 using Futurum.Core.Result;
+using Futurum.Core.Tests.Helper.Option;
 using Futurum.Core.Tests.Helper.Result;
 
 using Xunit;
@@ -11,23 +12,51 @@ namespace Futurum.Core.Tests.Result;
 
 public class ResultErrorCompositeExtensionsTests
 {
-    public class ToResultError
+    public class with_Parent
     {
+        private const string ErrorMessage = "ERROR_MESSAGE";
+
         [Fact]
-        public void Array()
+        public void IEnumerable()
         {
+            var parentResultError = ErrorMessage.ToResultError();
+            
             var resultErrors = Enumerable.Range(0, 10)
                                          .Select(x => x.ToString())
                                          .Select(x => x.ToResultError())
-                                         .ToArray();
+                                         .ToList();
 
-            var resultErrorComposite = resultErrors.ToResultError() as ResultErrorComposite;
+            var resultErrorComposite = ResultErrorCompositeExtensions.ToResultError(parentResultError, resultErrors) as ResultErrorComposite;
 
+            resultErrorComposite.Parent.ShouldBeHasValueWithValue(parentResultError);
+            
             resultErrorComposite.Children.Count().Should().Be(resultErrors.Count());
 
             resultErrorComposite.Children.Should().BeEquivalentTo(resultErrors);
         }
 
+        [Fact]
+        public void Array()
+        {
+            var parentResultError = ErrorMessage.ToResultError();
+            
+            var resultErrors = Enumerable.Range(0, 10)
+                                         .Select(x => x.ToString())
+                                         .Select(x => x.ToResultError())
+                                         .ToArray();
+
+            var resultErrorComposite = ResultErrorCompositeExtensions.ToResultError(parentResultError, resultErrors) as ResultErrorComposite;
+
+            resultErrorComposite.Parent.ShouldBeHasValueWithValue(parentResultError);
+            
+            resultErrorComposite.Children.Count().Should().Be(resultErrors.Count());
+
+            resultErrorComposite.Children.Should().BeEquivalentTo(resultErrors);
+        }
+    }
+
+    public class without_Parent
+    {
         [Fact]
         public void IEnumerble()
         {
@@ -39,35 +68,11 @@ public class ResultErrorCompositeExtensionsTests
 
             var resultErrorComposite = resultErrors.ToResultError() as ResultErrorComposite;
 
+            resultErrorComposite.Parent.ShouldBeHasNoValue();
+            
             resultErrorComposite.Children.Count().Should().Be(resultErrors.Count());
 
             resultErrorComposite.Children.Should().BeEquivalentTo(resultErrors);
-        }
-    }
-
-    public class EnhanceWithError
-    {
-        private const string ErrorMessage1 = "ERROR_MESSAGE_1";
-        private const string ErrorMessage2 = "ERROR_MESSAGE_2";
-
-        [Fact]
-        public void ErrorMessage()
-        {
-            var error = ErrorMessage1.ToResultError();
-
-            var resultError = error.EnhanceWithError(ErrorMessage2);
-
-            resultError.ShouldBeError(ErrorMessage2, ErrorMessage1);
-        }
-
-        [Fact]
-        public void IResultError()
-        {
-            var error = ErrorMessage1.ToResultError();
-
-            var resultError = error.EnhanceWithError(ErrorMessage2.ToResultError());
-
-            resultError.ShouldBeError(ErrorMessage2, ErrorMessage1);
         }
     }
 }

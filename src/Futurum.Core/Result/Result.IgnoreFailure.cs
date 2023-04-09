@@ -15,7 +15,13 @@ public static partial class ResultExtensions
     /// </summary>
     public static async Task<Result> IgnoreFailureAsync(this Task<Result> result)
     {
-        await result;
+        try
+        {
+            await result;
+        }
+        catch (Exception)
+        {
+        }
         
         return Result.Ok();
     }

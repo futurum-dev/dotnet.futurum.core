@@ -1,5 +1,3 @@
-using Futurum.Core.Option;
-
 namespace Futurum.Core.Result;
 
 public static partial class ResultEnumerableExtensions
@@ -25,36 +23,14 @@ public static partial class ResultEnumerableExtensions
     /// </summary>
     public static Result<TR> TryFirst<TSource, TR>(this IEnumerable<TSource> source, Func<TSource, Result<TR>> func, string errorMessage)
     {
-        return Run(Option<Result<TR>>.None, source.ToArray());
-
-        Result<TR> Run(Option<Result<TR>> previous, TSource[] items) =>
-            items.Length switch
-            {
-                0 => Result.Fail<TR>(errorMessage),
-                _ => previous.HasNoValue
-                    ? NoPrevious(items[0], items[1..])
-                    : WithPrevious(previous.Value, items[0], items[1..])
-            };
-
-        Result<TR> NoPrevious(TSource item, TSource[] items)
+        foreach (var x in source)
         {
-            var current = func(item);
+            var result = func(x);
 
-            return current.IsSuccess
-                ? Result.Ok(current.Value.Value)
-                : Run(current, items);
+            if (result.IsSuccess) return result;
         }
 
-        Result<TR> WithPrevious(Result<TR> previous, TSource item, TSource[] items)
-        {
-            var current = previous.IsSuccess
-                ? Result.Ok(previous.Value.Value)
-                : func(item);
-
-            return current.IsSuccess
-                ? Result.Ok(current.Value.Value)
-                : Run(current, items);
-        }
+        return Result.Fail<TR>(errorMessage);
     }
 
     /// <summary>
@@ -78,36 +54,14 @@ public static partial class ResultEnumerableExtensions
     /// </summary>
     public static Result<TR> TryFirst<TSource, TR>(this IEnumerable<TSource> source, Func<TSource, Result<TR>> func, IResultError errorMessage)
     {
-        return Run(Option<Result<TR>>.None, source.ToArray());
-
-        Result<TR> Run(Option<Result<TR>> previous, TSource[] items) =>
-            items.Length switch
-            {
-                0 => Result.Fail<TR>(errorMessage),
-                _ => previous.HasNoValue
-                    ? NoPrevious(items[0], items[1..])
-                    : WithPrevious(previous.Value, items[0], items[1..])
-            };
-
-        Result<TR> NoPrevious(TSource item, TSource[] items)
+        foreach (var x in source)
         {
-            var current = func(item);
+            var result = func(x);
 
-            return current.IsSuccess
-                ? Result.Ok(current.Value.Value)
-                : Run(current, items);
+            if (result.IsSuccess) return result;
         }
 
-        Result<TR> WithPrevious(Result<TR> previous, TSource item, TSource[] items)
-        {
-            var current = previous.IsSuccess
-                ? Result.Ok(previous.Value.Value)
-                : func(item);
-
-            return current.IsSuccess
-                ? Result.Ok(current.Value.Value)
-                : Run(current, items);
-        }
+        return Result.Fail<TR>(errorMessage);
     }
 
     /// <summary>
@@ -129,38 +83,16 @@ public static partial class ResultEnumerableExtensions
     /// If none of the elements in the sequence when passed to <paramref name="func"/> returns <see cref="Result"/> with <see cref="Result.IsSuccess"/> true,
     /// then <see cref="Result"/> with <see cref="Result.IsFailure"/> true and <paramref name="errorMessage"/> as the error is returned.
     /// </summary>
-    public static Task<Result<TR>> TryFirstAsync<TSource, TR>(this IEnumerable<TSource> source, Func<TSource, Task<Result<TR>>> func, string errorMessage)
+    public static async Task<Result<TR>> TryFirstAsync<TSource, TR>(this IEnumerable<TSource> source, Func<TSource, Task<Result<TR>>> func, string errorMessage)
     {
-        return RunAsync(Option<Result<TR>>.None, source.ToArray());
-
-        async Task<Result<TR>> RunAsync(Option<Result<TR>> previous, TSource[] items) =>
-            items.Length switch
-            {
-                0 => Result.Fail<TR>(errorMessage),
-                _ => previous.HasNoValue
-                    ? await NoPrevious(items[0], items[1..])
-                    : await WithPrevious(previous.Value, items[0], items[1..])
-            };
-
-        async Task<Result<TR>> NoPrevious(TSource item, TSource[] items)
+        foreach (var x in source)
         {
-            var current = await func(item);
+            var result = await func(x);
 
-            return await (current.IsSuccess
-                ? Result.OkAsync(current.Value.Value)
-                : RunAsync(current, items));
+            if (result.IsSuccess) return result;
         }
 
-        async Task<Result<TR>> WithPrevious(Result<TR> previous, TSource item, TSource[] items)
-        {
-            var current = await (previous.IsSuccess
-                ? Result.OkAsync(previous.Value.Value)
-                : func(item));
-
-            return await (current.IsSuccess
-                ? Result.OkAsync(current.Value.Value)
-                : RunAsync(current, items));
-        }
+        return Result.Fail<TR>(errorMessage);
     }
 
     /// <summary>
@@ -182,37 +114,15 @@ public static partial class ResultEnumerableExtensions
     /// If none of the elements in the sequence when passed to <paramref name="func"/> returns <see cref="Result"/> with <see cref="Result.IsSuccess"/> true,
     /// then <see cref="Result"/> with <see cref="Result.IsFailure"/> true and <paramref name="errorMessage"/> as the error is returned.
     /// </summary>
-    public static Task<Result<TR>> TryFirstAsync<TSource, TR>(this IEnumerable<TSource> source, Func<TSource, Task<Result<TR>>> func, IResultError errorMessage)
+    public static async Task<Result<TR>> TryFirstAsync<TSource, TR>(this IEnumerable<TSource> source, Func<TSource, Task<Result<TR>>> func, IResultError errorMessage)
     {
-        return RunAsync(Option<Result<TR>>.None, source.ToArray());
-
-        async Task<Result<TR>> RunAsync(Option<Result<TR>> previous, TSource[] items) =>
-            items.Length switch
-            {
-                0 => Result.Fail<TR>(errorMessage),
-                _ => previous.HasNoValue
-                    ? await NoPrevious(items[0], items[1..])
-                    : await WithPrevious(previous.Value, items[0], items[1..])
-            };
-
-        async Task<Result<TR>> NoPrevious(TSource item, TSource[] items)
+        foreach (var x in source)
         {
-            var current = await func(item);
+            var result = await func(x);
 
-            return await (current.IsSuccess
-                ? Result.OkAsync(current.Value.Value)
-                : RunAsync(current, items));
+            if (result.IsSuccess) return result;
         }
 
-        async Task<Result<TR>> WithPrevious(Result<TR> previous, TSource item, TSource[] items)
-        {
-            var current = await (previous.IsSuccess
-                ? Result.OkAsync(previous.Value.Value)
-                : func(item));
-
-            return await (current.IsSuccess
-                ? Result.OkAsync(current.Value.Value)
-                : RunAsync(current, items));
-        }
+        return Result.Fail<TR>(errorMessage);
     }
 }

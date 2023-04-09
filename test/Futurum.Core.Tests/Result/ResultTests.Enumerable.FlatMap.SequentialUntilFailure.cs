@@ -10,7 +10,7 @@ using Xunit;
 
 namespace Futurum.Core.Tests.Result;
 
-public class ResultFlatMapSequentialUntilFailureTests
+public class ResultEnumerableFlatMapSequentialUntilFailureTests
 {
     private const string ErrorMessage1 = "ERROR_MESSAGE_1";
 

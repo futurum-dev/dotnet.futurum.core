@@ -1,6 +1,8 @@
+using System.Collections.Concurrent;
+
 namespace Futurum.Core.Result;
 
-public static partial class ResultExtensions
+public static partial class ResultEnumerableExtensions
 {
     /// <summary>
     /// Transforms each element of a sequence to an <see cref="IEnumerable{T}"/> and flattens the resulting sequences into one sequence.
@@ -17,10 +19,22 @@ public static partial class ResultExtensions
     ///         </description>
     ///     </item>
     /// </list>
-    /// <para>Runs without parallelism i.e. sequential</para>
+    /// <para>Control the parallelism with <paramref name="parallelOptions"/> parameter</para>
     /// </summary>
-    public static Task<Result> FlatMapSequentialAsync<T>(this IEnumerable<T> source, Func<T, Task<Result>> func) =>
-        source.FlatMapAsync(SequentialParallelOptions, func);
+    public static async Task<Result> FlatMapAsync<T>(this IEnumerable<T> source, ParallelOptions parallelOptions, Func<T, Task<Result>> func)
+    {
+        var concurrentBag = new ConcurrentBag<Result>();
+
+        await Parallel.ForEachAsync(source, parallelOptions,
+                                    async (x, _) =>
+                                    {
+                                        var result = await func(x);
+
+                                        concurrentBag.Add(result);
+                                    });
+
+        return concurrentBag.Combine();
+    }
 
     /// <summary>
     /// Transforms each element of a sequence to an <see cref="IEnumerable{T}"/> and flattens the resulting sequences into one sequence.
@@ -37,10 +51,22 @@ public static partial class ResultExtensions
     ///         </description>
     ///     </item>
     /// </list>
-    /// <para>Runs without parallelism i.e. sequential</para>
+    /// <para>Control the parallelism with <paramref name="parallelOptions"/> parameter</para>
     /// </summary>
-    public static Task<Result<IEnumerable<TR>>> FlatMapSequentialAsync<T, TR>(this IEnumerable<T> source, Func<T, Task<Result<TR>>> func) =>
-        source.FlatMapAsync(SequentialParallelOptions, func);
+    public static async Task<Result<IEnumerable<TR>>> FlatMapAsync<T, TR>(this IEnumerable<T> source, ParallelOptions parallelOptions, Func<T, Task<Result<TR>>> func)
+    {
+        var concurrentBag = new ConcurrentBag<Result<TR>>();
+
+        await Parallel.ForEachAsync(source, parallelOptions,
+                                    async (x, _) =>
+                                    {
+                                        var result = await func(x);
+
+                                        concurrentBag.Add(result);
+                                    });
+
+        return concurrentBag.Combine();
+    }
 
     /// <summary>
     /// Transforms each element of a sequence to an <see cref="IEnumerable{T}"/> and flattens the resulting sequences into one sequence.
@@ -57,10 +83,22 @@ public static partial class ResultExtensions
     ///         </description>
     ///     </item>
     /// </list>
-    /// <para>Runs without parallelism i.e. sequential</para>
+    /// <para>Control the parallelism with <paramref name="parallelOptions"/> parameter</para>
     /// </summary>
-    public static Task<Result<IEnumerable<TR>>> FlatMapSequentialAsync<T, TR>(this IEnumerable<T> source, Func<T, Task<Result<IEnumerable<TR>>>> func) =>
-        source.FlatMapAsync(SequentialParallelOptions, func);
+    public static async Task<Result<IEnumerable<TR>>> FlatMapAsync<T, TR>(this IEnumerable<T> source, ParallelOptions parallelOptions, Func<T, Task<Result<IEnumerable<TR>>>> func)
+    {
+        var concurrentBag = new ConcurrentBag<Result<IEnumerable<TR>>>();
+
+        await Parallel.ForEachAsync(source, parallelOptions,
+                                    async (x, _) =>
+                                    {
+                                        var result = await func(x);
+
+                                        concurrentBag.Add(result);
+                                    });
+
+        return concurrentBag.Combine();
+    }
 
     /// <summary>
     /// Transforms each element of a sequence to an <see cref="IEnumerable{T}"/> and flattens the resulting sequences into one sequence.
@@ -77,10 +115,22 @@ public static partial class ResultExtensions
     ///         </description>
     ///     </item>
     /// </list>
-    /// <para>Runs without parallelism i.e. sequential</para>
+    /// <para>Control the parallelism with <paramref name="parallelOptions"/> parameter</para>
     /// </summary>
-    public static Task<Result<IEnumerable<TR>>> FlatMapSequentialAsync<T, TR>(this IEnumerable<T> source, Func<T, Task<Result<List<TR>>>> func) =>
-        source.FlatMapAsync(SequentialParallelOptions, func);
+    public static async Task<Result<IEnumerable<TR>>> FlatMapAsync<T, TR>(this IEnumerable<T> source, ParallelOptions parallelOptions, Func<T, Task<Result<List<TR>>>> func)
+    {
+        var concurrentBag = new ConcurrentBag<Result<List<TR>>>();
+
+        await Parallel.ForEachAsync(source, parallelOptions,
+                                    async (x, _) =>
+                                    {
+                                        var result = await func(x);
+
+                                        concurrentBag.Add(result);
+                                    });
+
+        return concurrentBag.Combine();
+    }
 
     /// <summary>
     /// Transforms each element of a sequence to an <see cref="IEnumerable{T}"/> and flattens the resulting sequences into one sequence.
@@ -97,10 +147,11 @@ public static partial class ResultExtensions
     ///         </description>
     ///     </item>
     /// </list>
-    /// <para>Runs without parallelism i.e. sequential</para>
+    /// <para>Control the parallelism with <paramref name="parallelOptions"/> parameter</para>
     /// </summary>
-    public static Task<Result<IEnumerable<TR>>> FlatMapSequentialAsync<T, TR>(this Task<Result<IEnumerable<T>>> resultTaskSource, Func<T, Task<Result<IEnumerable<TR>>>> func) =>
-        resultTaskSource.FlatMapAsync(SequentialParallelOptions, func);
+    public static Task<Result<IEnumerable<TR>>> FlatMapAsync<T, TR>(this Task<Result<IEnumerable<T>>> resultTaskSource, ParallelOptions parallelOptions,
+                                                                    Func<T, Task<Result<IEnumerable<TR>>>> func) =>
+        resultTaskSource.FlatMapAsync(parallelOptions, func, ResultExtensions.Combine);
 
     /// <summary>
     /// Transforms each element of a sequence to an <see cref="IEnumerable{T}"/> and flattens the resulting sequences into one sequence.
@@ -117,10 +168,53 @@ public static partial class ResultExtensions
     ///         </description>
     ///     </item>
     /// </list>
-    /// <para>Runs without parallelism i.e. sequential</para>
+    /// <para>Control the parallelism with <paramref name="parallelOptions"/> parameter</para>
     /// </summary>
-    public static Task<Result> FlatMapSequentialAsync<T>(this Task<Result<IEnumerable<T>>> resultTaskSource, Func<T, Task<Result>> func) =>
-        resultTaskSource.FlatMapAsync(SequentialParallelOptions, func);
+    public static Task<Result> FlatMapAsync<T>(this Task<Result<IEnumerable<T>>> resultTaskSource, ParallelOptions parallelOptions, Func<T, Task<Result>> func) =>
+        resultTaskSource.FlatMapAsync(parallelOptions, func, ResultExtensions.Combine);
 
-    private static readonly ParallelOptions SequentialParallelOptions = new() { MaxDegreeOfParallelism = 1 };
+    public static Task<Result<TR>> FlatMapAsync<T, TI, TR>(this Task<Result<IEnumerable<T>>> resultTaskSource, ParallelOptions parallelOptions,
+                                                           Func<T, Task<Result<TI>>> func,
+                                                           Func<IEnumerable<Result<TI>>, Result<TR>> reduce)
+    {
+        async Task<Result<TR>> Execute(IEnumerable<T> source)
+        {
+            var concurrentBag = new ConcurrentBag<Result<TI>>();
+
+            await Parallel.ForEachAsync(source, parallelOptions,
+                                        async (x, _) =>
+                                        {
+                                            var result = await func(x);
+
+                                            concurrentBag.Add(result);
+                                        });
+
+            return reduce(concurrentBag);
+        }
+
+        return resultTaskSource.ThenAsync(Execute);
+    }
+
+    public static Task<Result> FlatMapAsync<T>(this Task<Result<IEnumerable<T>>> resultTaskSource, ParallelOptions parallelOptions,
+                                               Func<T, Task<Result>> func,
+                                               Func<IEnumerable<Result>, Result> reduce)
+    {
+        async Task<Result> Execute(IEnumerable<T> source)
+        {
+            var concurrentBag = new ConcurrentBag<Result>();
+
+            await Parallel.ForEachAsync(source, parallelOptions,
+                                        async (x, _) =>
+                                        {
+                                            var result = await func(x);
+
+                                            concurrentBag.Add(result);
+                                        });
+
+            return reduce(concurrentBag);
+        }
+
+        return resultTaskSource.ThenAsync(Execute)
+                               .ToNonGenericAsync();
+    }
 }

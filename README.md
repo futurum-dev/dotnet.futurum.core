@@ -11,8 +11,9 @@ A dotnet library providing Option and Result data types, based on the concepts b
 - [x] Option data type that represents a value that is either present or not present
 - [x] Based on the concepts behind [Railway Oriented Programming](https://fsharpforfunandprofit.com/rop/)
 - [x] Extension methods that allows interacting with and going into and out of the Result and Option data types
-- [x] [Tested solution](https://coveralls.io/github/futurum-dev/dotnet.futurum.core?branch=main) > 99% test coverage
 - [x] Fluent discoverable and commented API
+- [x] [Tested solution](https://coveralls.io/github/futurum-dev/dotnet.futurum.core?branch=main) > 99% test coverage
+- [x] [Tested](#stryker-mutation-testing) with [Stryker](https://stryker-mutator.io/docs/stryker-net/introduction/) mutation testing > 95%
 - [x] Integration with [Polly](https://github.com/App-vNext/Polly) via [Futurum.Core.Polly](https://github.com/futurum-dev/dotnet.futurum.core.polly)
 
 [Result](#result)
@@ -213,8 +214,6 @@ Creates a *success* Result&lt;T&gt; with the payload provided
 var result = 2.ToResultOk();
 ```
 
-#### FlatMap
-
 #### IgnoreFailure
 Ignores the failure on Result and always returns Result.Ok().
 
@@ -356,6 +355,8 @@ var result = await Result.TryAsync(func, () => ERROR_MESSAGE);
 ```
 
 A nice pattern to follow using local functions is as follows:
+
+##### With a return value
 ```csharp
 public Task<Result<string>> ExecuteAsync()
 {
@@ -367,6 +368,8 @@ public Task<Result<string>> ExecuteAsync()
     }
 }
 ```
+
+##### With a Result&lt;T&gt; return value
 ```csharp
 public Task<Result<string>> ExecuteAsync()
 {
@@ -378,6 +381,8 @@ public Task<Result<string>> ExecuteAsync()
     }
 }
 ```
+
+##### With no return value
 ```csharp
 public Task<Result> ExecuteAsync()
 {
@@ -389,6 +394,8 @@ public Task<Result> ExecuteAsync()
     }
 }
 ```
+
+##### With a Result return value
 ```csharp
 public Task<Result> ExecuteAsync()
 {
@@ -424,18 +431,22 @@ Comes out of the *Result* monad.
 - If the *Result* is *Ok*, then return the value if there is one
 - If the *Result* is *Fail*, then throw an exception, passing through the ResultError data
 
+##### Success - With no return value
 ```csharp
 Result.Ok().Unwrap();
 ```
 
-```csharp
-Result.Fail(ErrorMessage).Unwrap();
-```
-
+##### Success - With a return value
 ```csharp
 var value = Result.Ok(1).Unwrap();
 ```
 
+##### Failure - With no return value (Exception will be thrown)
+```csharp
+Result.Fail(ErrorMessage).Unwrap();
+```
+
+##### Failure - With a return value (Exception will be thrown)
 ```csharp
 var value = Result.Fail<int>(ErrorMessage).Unwrap();
 ```
@@ -447,9 +458,9 @@ Return only those elements of a sequence of Result&lt;T&gt; that are *success*.
 If none of the elements in the sequence are *success*, then a Result&lt;T&gt; *failure* is returned.
 
 ```csharp
-var result1 = Result.Ok(value1);
-var result2 = Result.Ok(value2);
-var result3 = Result.Ok(value3);
+var result1 = Result.Ok(1);
+var result2 = Result.Ok(2);
+var result3 = Result.Ok(3);
 
 IEnumerable<int> values = new[] {result1, result2, result3}.Choose()
 ```
@@ -465,11 +476,130 @@ var resultInput = Result.Ok(values);
 Result<IEnumerable<int>> resultOutput = resultInput.Filter(x => x % 2 == 0);
 ```
 
+#### FlatMap
+Transforms each element of a sequence to an IEnumerable&lt;T&gt; and flattens the resulting sequences into one sequence.
+
+```csharp
+(IEnumerable<T>, Func<T, Result>) -> Result
+```
+
+```csharp
+var input = new[] {1, 2};
+
+Result outputResult = input.FlatMap(x => Result.Ok());
+```
+
+```csharp
+(IEnumerable<T>, Func<T, Result<TR>>) -> Result<IEnumerable<TR>>
+```
+
+```csharp
+var input = new[] {1, 2};
+
+Result outputResult = input.FlatMap(x => Result.Ok());
+```
+
+```csharp
+(IEnumerable<T>, Func<T, IEnumerable<TR>>) -> Result<IEnumerable<TR>>
+```
+
+```csharp
+var input = new[] {1, 2};
+
+Result<IEnumerable<int>> outputResult = input.FlatMap(x =>
+{
+    if (x == 1) return Result.Fail<IEnumerable<int>>(ErrorMessage1);
+
+    return Result.Fail<IEnumerable<int>>(ErrorMessage2);
+});
+```
+
+```csharp
+(Result<IEnumerable<T>>, Func<T, Result<IEnumerable<TR>>>) -> Result<IEnumerable<TR>>
+```
+
+```csharp
+var input = new[] {1, 2}.AsEnumerable().ToResultOk();
+
+Result<IEnumerable<int>> outputResult = input.FlatMap(x =>
+{
+    if (x == 1) return Result.Fail<IEnumerable<int>>(ErrorMessage1);
+
+    return Result.Fail<IEnumerable<int>>(ErrorMessage2);
+});
+```
+
+```csharp
+(Result<IEnumerable<T>>, Func<T, Result<TR>>) -> Result<IEnumerable<TR>>
+```
+
+```csharp
+var input = new[] {1, 2}.AsEnumerable().ToResultOk();
+
+Result<IEnumerable<int>> outputResult = input.FlatMap(x =>
+{
+    if (x == 1) return Result.Fail<int>(ErrorMessage1);
+
+    return Result.Fail<int>(ErrorMessage2);
+});
+```
+    
+```csharp
+Result<IEnumerable<IEnumerable<T>>> -> Result<IEnumerable<T>>
+```
+
+```csharp
+var input = new[] {1, 2};
+
+Result<IEnumerable<int>> outputResult = input.FlatMap(x => new[] { x * 2 }.AsEnumerable().ToResultOk());
+```
+
+**NOTE**
+- If *ParallelOptions* is not specified, then it will use default *ParallelOptions*.
+- There are overloads that take a *ParallelOptions*, so you can control the level of concurrency.
+
 ##### FlatMapAs
-Transforms an Result&lt;IEnumerable&gt;T&gt;&gt; to a IEnumerable&gt;Result&lt;T&gt;&gt;
+Transforms an Result&lt;IEnumerable&lt;T&gt;&gt; to a Result&lt;IEnumerable&gt;TR&gt;&gt;
+
+```csharp
+public record Container(IEnumerable<int> Values);
+```
+
+```csharp
+var values = Enumerable.Range(0, 1)
+                       .Select(x => new Container(new []{x}));
+
+Result<IEnumerable<Container>> resultInput = Result.Ok(values);
+
+Result<IEnumerable<int>> resultOutput = resultInput.FlatMapAs(x => x.Values, x -> x * 2);
+```
+
+#### FlatMapSequential
+Transforms each element of a sequence to an IEnumerable&lt;T&gt; and flattens the resulting sequences into one sequence.
+
+**NOTE** This runs sequentially, i.e. runs with a ParallelOptions MaxDegreeOfParallelism = 1
+
+```csharp
+var input = new[] { 1, 2 };
+
+Result outputResult = await input.FlatMapSequentialAsync(x =>
+{
+    if (x == 1) return Result.FailAsync(ErrorMessage1);
+
+    return Result.FailAsync(ErrorMessage2);
+});
+```
+#### FlatMapSequentialUntilFailure
+Transforms each element of a sequence to an IEnumerable&lt;T&gt;, returning the first error it finds.
+
+```csharp
+var input = new [] {1,2, 3};
+
+Result outputResult = input.FlatMapSequentialUntilFailure(x => x == 2 ? Result.Fail(ErrorMessage1) : Result.Ok());
+```
 
 ##### MapAs
-Transforms an Result&lt;IEnumerable&gt;T&gt;&gt; to a Result&lt;IEnumerable&gt;TR&gt;&gt;
+Transforms an Result&lt;IEnumerable&lt;T&gt;&gt; to a Result&lt;IEnumerable&gt;TR&gt;&gt;
 
 ```csharp
 var values = Enumerable.Range(0, 1);
@@ -506,7 +636,7 @@ Result result = new[] {result1, result2, result3}.PickFailureOrSuccess();
 ```
 
 ##### ThenAs
-Transforms an Result&lt;IEnumerable&gt;T&gt;&gt; to a Result&lt;IEnumerable&gt;TR&gt;&gt;
+Transforms an Result&lt;IEnumerable&lt;T&gt;&gt; to a Result&lt;IEnumerable&gt;TR&gt;&gt;
 
 ```csharp
 var values = Enumerable.Range(0, 1);
@@ -534,7 +664,7 @@ Result<string> result = input.TryFirst(x =>
 ```
 
 ##### TryToDictionary
-Try to create a Dictionary&lt;TKey, TElement;&gt; from an IEnumerable&gt;T&gt; according to specified key selector and element selector functions.
+Try to create a Dictionary&lt;TKey, TElement;&gt; from an IEnumerable&lt;T&gt; according to specified key selector and element selector functions.
 
 **NOTE:** This will explicitly checks for duplicate keys and return a Result&lt;Dictionary&lt;TKey, TElement&gt;&gt; *failure* if there are any.
 
@@ -552,12 +682,10 @@ Return only those elements of a sequence of Result&lt;T&gt; that are *success*.
 If none of the elements in the sequence are *success*, then a Result&lt;T&gt; *failure* is returned.
 
 ```csharp
-var result1 = Result.Ok(1);
-var result2 = Result.Ok(2);
-var result3 = Result.Ok(3);
+IAsyncEnumerable<Result<int>> inputResults = AsyncEnumerable.Range(1, 3)
+                                                            .Select(x => Core.Result.Result.Ok(x));
 
-List<int> values = await ToAsyncEnumerable(new[] {result1, result2, result3}).Choose()
-                                                                             .ToListAsync();
+List<int> values = await inputResults.Choose().ToListAsync();
 ```
 
 ##### Filter
@@ -572,7 +700,7 @@ Result<IAsyncEnumerable<int>> returnedResult = resultInput.Filter(x => x % 2 == 
 ```
 
 ##### MapAs
-Transforms an Result&lt;IEnumerable&gt;T&gt;&gt; to a Result&lt;IEnumerable&gt;TR&gt;&gt;
+Transforms an Result&lt;IEnumerable&lt;T&gt;&gt; to a Result&lt;IEnumerable&gt;TR&gt;&gt;
 
 ```csharp
 var values = AsyncEnumerable.Range(0, 1);
@@ -992,3 +1120,19 @@ var result = option.ToResult(ErrorMessage);
 
 ##### Result -> Option
 This is **not supported** as it would result in the loss of the error context.
+
+## Stryker mutation testing
+### Make sure you have Stryker installed
+```bash
+dotnet tool install -g dotnet-stryker
+```
+
+### Make sure the Test project is built
+```bash
+dotnet build ./test/Futurum.Core.Tests
+```
+
+### Run Stryker
+```bash
+dotnet stryker
+```

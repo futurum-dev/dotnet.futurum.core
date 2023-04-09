@@ -1,6 +1,6 @@
 namespace Futurum.Core.Result;
 
-public static partial class ResultExtensions
+public static partial class ResultEnumerableExtensions
 {
     /// <summary>
     /// Transforms each element of a sequence to an <see cref="IEnumerable{T}"/>, returning the first error it finds.

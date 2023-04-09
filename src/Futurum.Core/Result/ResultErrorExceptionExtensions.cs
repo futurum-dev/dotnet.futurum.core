@@ -17,7 +17,7 @@ public static class ResultErrorExceptionExtensions
 
     /// <summary>
     /// Transforms an <see cref="Exception"/> and a <paramref name="errorMessage"/> into either a <see cref="ResultErrorException"/>
-    /// or a <see cref="ResultErrorCompositeExtensions"/> with the <see cref="errorMessage"/> and a <see cref="ResultErrorException"/>
+    /// or a <see cref="ResultErrorCompositeExtensions"/> with the <paramref name="errorMessage"/> as the parent and a <see cref="ResultErrorException"/> as the child
     /// </summary>
     public static IResultError ToResultError(this Exception exception, string errorMessage) =>
         string.IsNullOrEmpty(errorMessage)
