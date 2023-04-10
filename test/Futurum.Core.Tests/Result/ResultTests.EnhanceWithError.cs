@@ -413,4 +413,27 @@ public class ResultEnhanceWithErrorTests
             }
         }
     }
+    
+    public class with_IResultError
+    {
+        [Fact]
+        public void ErrorMessage()
+        {
+            var error = ErrorMessage1.ToResultError();
+
+            var resultError = error.EnhanceWithError(ErrorMessage2);
+
+            resultError.ShouldBeError(ErrorMessage2, ErrorMessage1);
+        }
+
+        [Fact]
+        public void IResultError()
+        {
+            var error = ErrorMessage1.ToResultError();
+
+            var resultError = error.EnhanceWithError(ErrorMessage2.ToResultError());
+
+            resultError.ShouldBeError(ErrorMessage2, ErrorMessage1);
+        }
+    }
 }

@@ -11,7 +11,7 @@ using Xunit;
 
 namespace Futurum.Core.Tests.Result;
 
-public class ResultFlatMapParallelOptionsTests
+public class ResultEnumerableFlatMapParallelOptionsTests
 {
     private const string ErrorMessage1 = "ERROR_MESSAGE_1";
     private const string ErrorMessage2 = "ERROR_MESSAGE_2";

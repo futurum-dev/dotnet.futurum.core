@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 
 using Futurum.Core.Result;
@@ -44,6 +45,21 @@ public class ResultIgnoreFailureTests
             var resultOutput = await resultInput.IgnoreFailureAsync();
 
             resultOutput.ShouldBeSuccess();
+        }
+
+        [Fact]
+        public async Task Exception()
+        {
+            var resultInput = ThrowException();
+
+            var resultOutput = await resultInput.IgnoreFailureAsync();
+
+            resultOutput.ShouldBeSuccess();
+
+            Task<Core.Result.Result> ThrowException()
+            {
+                return Task.FromException<Core.Result.Result>(new Exception(ErrorMessage));
+            }
         }
 
         [Fact]

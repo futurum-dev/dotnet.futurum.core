@@ -45,7 +45,7 @@ public class ResultCombineAllTests
             }
 
             [Fact]
-            public void mixed()
+            public void mixed_1()
             {
                 var result1 = Core.Result.Result.Ok(Guid.NewGuid().ToString());
                 var result2 = Core.Result.Result.Fail<string>(ErrorMessage1);
@@ -54,8 +54,19 @@ public class ResultCombineAllTests
 
                 result.ShouldBeFailureWithError($"{ErrorMessage1}");
             }
+
+            [Fact]
+            public void mixed_2()
+            {
+                var result1 = Core.Result.Result.Fail<string>(ErrorMessage1);
+                var result2 = Core.Result.Result.Ok(Guid.NewGuid().ToString());
+
+                var result = Core.Result.Result.CombineAll(result1, result2);
+
+                result.ShouldBeFailureWithError($"{ErrorMessage1}");
+            }
         }
-        
+
         public class Three
         {
             [Fact]
@@ -86,7 +97,7 @@ public class ResultCombineAllTests
             }
 
             [Fact]
-            public void mixed()
+            public void mixed_1()
             {
                 var result1 = Core.Result.Result.Ok(Guid.NewGuid().ToString());
                 var result2 = Core.Result.Result.Fail<string>(ErrorMessage1);
@@ -96,8 +107,44 @@ public class ResultCombineAllTests
 
                 result.ShouldBeFailureWithError($"{ErrorMessage1};{ErrorMessage2}");
             }
+
+            [Fact]
+            public void mixed_2()
+            {
+                var result1 = Core.Result.Result.Fail<string>(ErrorMessage1);
+                var result2 = Core.Result.Result.Ok(Guid.NewGuid().ToString());
+                var result3 = Core.Result.Result.Fail<string>(ErrorMessage2);
+
+                var result = Core.Result.Result.CombineAll(result1, result2, result3);
+
+                result.ShouldBeFailureWithError($"{ErrorMessage1};{ErrorMessage2}");
+            }
+
+            [Fact]
+            public void mixed_3()
+            {
+                var result1 = Core.Result.Result.Fail<string>(ErrorMessage1);
+                var result2 = Core.Result.Result.Fail<string>(ErrorMessage2);
+                var result3 = Core.Result.Result.Ok(Guid.NewGuid().ToString());
+
+                var result = Core.Result.Result.CombineAll(result1, result2, result3);
+
+                result.ShouldBeFailureWithError($"{ErrorMessage1};{ErrorMessage2}");
+            }
+
+            [Fact]
+            public void mixed_4()
+            {
+                var result1 = Core.Result.Result.Ok(Guid.NewGuid().ToString());
+                var result2 = Core.Result.Result.Fail<string>(ErrorMessage1);
+                var result3 = Core.Result.Result.Ok(Guid.NewGuid().ToString());
+
+                var result = Core.Result.Result.CombineAll(result1, result2, result3);
+
+                result.ShouldBeFailureWithError(ErrorMessage1);
+            }
         }
-        
+
         public class Four
         {
             [Fact]
@@ -131,7 +178,7 @@ public class ResultCombineAllTests
             }
 
             [Fact]
-            public void mixed()
+            public void mixed_1()
             {
                 var result1 = Core.Result.Result.Ok(Guid.NewGuid().ToString());
                 var result2 = Core.Result.Result.Fail<string>(ErrorMessage1);
@@ -142,9 +189,126 @@ public class ResultCombineAllTests
 
                 result.ShouldBeFailureWithError($"{ErrorMessage1};{ErrorMessage2};{ErrorMessage3}");
             }
+
+            [Fact]
+            public void mixed_2()
+            {
+                var result1 = Core.Result.Result.Fail<string>(ErrorMessage1);
+                var result2 = Core.Result.Result.Ok(Guid.NewGuid().ToString());
+                var result3 = Core.Result.Result.Fail<string>(ErrorMessage2);
+                var result4 = Core.Result.Result.Fail<string>(ErrorMessage3);
+
+                var result = Core.Result.Result.CombineAll(result1, result2, result3, result4);
+
+                result.ShouldBeFailureWithError($"{ErrorMessage1};{ErrorMessage2};{ErrorMessage3}");
+            }
+
+            [Fact]
+            public void mixed_3()
+            {
+                var result1 = Core.Result.Result.Fail<string>(ErrorMessage1);
+                var result2 = Core.Result.Result.Fail<string>(ErrorMessage2);
+                var result3 = Core.Result.Result.Ok(Guid.NewGuid().ToString());
+                var result4 = Core.Result.Result.Fail<string>(ErrorMessage3);
+
+                var result = Core.Result.Result.CombineAll(result1, result2, result3, result4);
+
+                result.ShouldBeFailureWithError($"{ErrorMessage1};{ErrorMessage2};{ErrorMessage3}");
+            }
+
+            [Fact]
+            public void mixed_4()
+            {
+                var result1 = Core.Result.Result.Fail<string>(ErrorMessage1);
+                var result2 = Core.Result.Result.Fail<string>(ErrorMessage2);
+                var result3 = Core.Result.Result.Fail<string>(ErrorMessage3);
+                var result4 = Core.Result.Result.Ok(Guid.NewGuid().ToString());
+
+                var result = Core.Result.Result.CombineAll(result1, result2, result3, result4);
+
+                result.ShouldBeFailureWithError($"{ErrorMessage1};{ErrorMessage2};{ErrorMessage3}");
+            }
+
+            [Fact]
+            public void mixed_5()
+            {
+                var result1 = Core.Result.Result.Ok(Guid.NewGuid().ToString());
+                var result2 = Core.Result.Result.Ok(Guid.NewGuid().ToString());
+                var result3 = Core.Result.Result.Fail<string>(ErrorMessage1);
+                var result4 = Core.Result.Result.Fail<string>(ErrorMessage2);
+
+                var result = Core.Result.Result.CombineAll(result1, result2, result3, result4);
+
+                result.ShouldBeFailureWithError($"{ErrorMessage1};{ErrorMessage2}");
+            }
+
+            [Fact]
+            public void mixed_6()
+            {
+                var result1 = Core.Result.Result.Ok(Guid.NewGuid().ToString());
+                var result2 = Core.Result.Result.Fail<string>(ErrorMessage1);
+                var result3 = Core.Result.Result.Ok(Guid.NewGuid().ToString());
+                var result4 = Core.Result.Result.Fail<string>(ErrorMessage2);
+
+                var result = Core.Result.Result.CombineAll(result1, result2, result3, result4);
+
+                result.ShouldBeFailureWithError($"{ErrorMessage1};{ErrorMessage2}");
+            }
+
+            [Fact]
+            public void mixed_7()
+            {
+                var result1 = Core.Result.Result.Ok(Guid.NewGuid().ToString());
+                var result2 = Core.Result.Result.Fail<string>(ErrorMessage1);
+                var result3 = Core.Result.Result.Fail<string>(ErrorMessage2);
+                var result4 = Core.Result.Result.Ok(Guid.NewGuid().ToString());
+
+                var result = Core.Result.Result.CombineAll(result1, result2, result3, result4);
+
+                result.ShouldBeFailureWithError($"{ErrorMessage1};{ErrorMessage2}");
+            }
+
+            [Fact]
+            public void mixed_8()
+            {
+                var result1 = Core.Result.Result.Ok(Guid.NewGuid().ToString());
+                var result2 = Core.Result.Result.Fail<string>(ErrorMessage1);
+                var result3 = Core.Result.Result.Ok(Guid.NewGuid().ToString());
+                var result4 = Core.Result.Result.Ok(Guid.NewGuid().ToString());
+
+                var result = Core.Result.Result.CombineAll(result1, result2, result3, result4);
+
+                result.ShouldBeFailureWithError(ErrorMessage1);
+            }
+
+            [Fact]
+            public void mixed_9()
+            {
+                var result1 = Core.Result.Result.Ok(Guid.NewGuid().ToString());
+                var result2 = Core.Result.Result.Ok(Guid.NewGuid().ToString());
+                var result3 = Core.Result.Result.Fail<string>(ErrorMessage1);
+                var result4 = Core.Result.Result.Ok(Guid.NewGuid().ToString());
+
+                var result = Core.Result.Result.CombineAll(result1, result2, result3, result4);
+
+                result.ShouldBeFailureWithError(ErrorMessage1);
+            }
+
+            [Fact]
+            public void mixed_10()
+            {
+                var result1 = Core.Result.Result.Ok(Guid.NewGuid().ToString());
+                var result2 = Core.Result.Result.Ok(Guid.NewGuid().ToString());
+                var result3 = Core.Result.Result.Ok(Guid.NewGuid().ToString());
+                var result4 = Core.Result.Result.Fail<string>(ErrorMessage1);
+
+                var result = Core.Result.Result.CombineAll(result1, result2, result3, result4);
+
+                result.ShouldBeFailureWithError(ErrorMessage1);
+            }
         }
     }
-    
+
     public class Async
     {
         public class Two
@@ -174,7 +338,7 @@ public class ResultCombineAllTests
             }
 
             [Fact]
-            public async Task mixed()
+            public async Task mixed_1()
             {
                 var result1 = Core.Result.Result.OkAsync(Guid.NewGuid().ToString());
                 var result2 = Core.Result.Result.FailAsync<string>(ErrorMessage1);
@@ -183,8 +347,19 @@ public class ResultCombineAllTests
 
                 result.ShouldBeFailureWithError($"{ErrorMessage1}");
             }
+
+            [Fact]
+            public async Task mixed_2()
+            {
+                var result1 = Core.Result.Result.FailAsync<string>(ErrorMessage1);
+                var result2 = Core.Result.Result.OkAsync(Guid.NewGuid().ToString());
+
+                var result = await Core.Result.Result.CombineAllAsync(result1, result2);
+
+                result.ShouldBeFailureWithError($"{ErrorMessage1}");
+            }
         }
-        
+
         public class Three
         {
             [Fact]
@@ -215,7 +390,7 @@ public class ResultCombineAllTests
             }
 
             [Fact]
-            public async Task mixed()
+            public async Task mixed_1()
             {
                 var result1 = Core.Result.Result.OkAsync(Guid.NewGuid().ToString());
                 var result2 = Core.Result.Result.FailAsync<string>(ErrorMessage1);
@@ -225,8 +400,44 @@ public class ResultCombineAllTests
 
                 result.ShouldBeFailureWithError($"{ErrorMessage1}");
             }
+
+            [Fact]
+            public async Task mixed_2()
+            {
+                var result1 = Core.Result.Result.FailAsync<string>(ErrorMessage1);
+                var result2 = Core.Result.Result.OkAsync(Guid.NewGuid().ToString());
+                var result3 = Core.Result.Result.FailAsync<string>(ErrorMessage2);
+
+                var result = await Core.Result.Result.CombineAllAsync(result1, result2, result3);
+
+                result.ShouldBeFailureWithError($"{ErrorMessage1};{ErrorMessage2}");
+            }
+
+            [Fact]
+            public async Task mixed_3()
+            {
+                var result1 = Core.Result.Result.FailAsync<string>(ErrorMessage1);
+                var result2 = Core.Result.Result.FailAsync<string>(ErrorMessage2);
+                var result3 = Core.Result.Result.OkAsync(Guid.NewGuid().ToString());
+
+                var result = await Core.Result.Result.CombineAllAsync(result1, result2, result3);
+
+                result.ShouldBeFailureWithError($"{ErrorMessage1};{ErrorMessage2}");
+            }
+
+            [Fact]
+            public async Task mixed_4()
+            {
+                var result1 = Core.Result.Result.OkAsync(Guid.NewGuid().ToString());
+                var result2 = Core.Result.Result.FailAsync<string>(ErrorMessage1);
+                var result3 = Core.Result.Result.OkAsync(Guid.NewGuid().ToString());
+
+                var result = await Core.Result.Result.CombineAllAsync(result1, result2, result3);
+
+                result.ShouldBeFailureWithError(ErrorMessage1);
+            }
         }
-        
+
         public class Four
         {
             [Fact]
@@ -260,7 +471,98 @@ public class ResultCombineAllTests
             }
 
             [Fact]
-            public async Task mixed()
+            public async Task mixed_1()
+            {
+                var result1 = Core.Result.Result.OkAsync(Guid.NewGuid().ToString());
+                var result2 = Core.Result.Result.FailAsync<string>(ErrorMessage1);
+                var result3 = Core.Result.Result.FailAsync<string>(ErrorMessage2);
+                var result4 = Core.Result.Result.FailAsync<string>(ErrorMessage3);
+
+                var result = await Core.Result.Result.CombineAllAsync(result1, result2, result3, result4);
+
+                result.ShouldBeFailureWithError($"{ErrorMessage1};{ErrorMessage2};{ErrorMessage3}");
+            }
+
+            [Fact]
+            public async Task mixed_2()
+            {
+                var result1 = Core.Result.Result.FailAsync<string>(ErrorMessage1);
+                var result2 = Core.Result.Result.OkAsync(Guid.NewGuid().ToString());
+                var result3 = Core.Result.Result.FailAsync<string>(ErrorMessage2);
+                var result4 = Core.Result.Result.FailAsync<string>(ErrorMessage3);
+
+                var result = await Core.Result.Result.CombineAllAsync(result1, result2, result3, result4);
+
+                result.ShouldBeFailureWithError($"{ErrorMessage1};{ErrorMessage2};{ErrorMessage3}");
+            }
+
+            [Fact]
+            public async Task mixed_3()
+            {
+                var result1 = Core.Result.Result.FailAsync<string>(ErrorMessage1);
+                var result2 = Core.Result.Result.FailAsync<string>(ErrorMessage2);
+                var result3 = Core.Result.Result.OkAsync(Guid.NewGuid().ToString());
+                var result4 = Core.Result.Result.FailAsync<string>(ErrorMessage3);
+
+                var result = await Core.Result.Result.CombineAllAsync(result1, result2, result3, result4);
+
+                result.ShouldBeFailureWithError($"{ErrorMessage1};{ErrorMessage2};{ErrorMessage3}");
+            }
+
+            [Fact]
+            public async Task mixed_4()
+            {
+                var result1 = Core.Result.Result.FailAsync<string>(ErrorMessage1);
+                var result2 = Core.Result.Result.FailAsync<string>(ErrorMessage2);
+                var result3 = Core.Result.Result.FailAsync<string>(ErrorMessage3);
+                var result4 = Core.Result.Result.OkAsync(Guid.NewGuid().ToString());
+
+                var result = await Core.Result.Result.CombineAllAsync(result1, result2, result3, result4);
+
+                result.ShouldBeFailureWithError($"{ErrorMessage1};{ErrorMessage2};{ErrorMessage3}");
+            }
+
+            [Fact]
+            public async Task mixed_5()
+            {
+                var result1 = Core.Result.Result.OkAsync(Guid.NewGuid().ToString());
+                var result2 = Core.Result.Result.OkAsync(Guid.NewGuid().ToString());
+                var result3 = Core.Result.Result.FailAsync<string>(ErrorMessage1);
+                var result4 = Core.Result.Result.FailAsync<string>(ErrorMessage2);
+
+                var result = await Core.Result.Result.CombineAllAsync(result1, result2, result3, result4);
+
+                result.ShouldBeFailureWithError($"{ErrorMessage1};{ErrorMessage2}");
+            }
+
+            [Fact]
+            public async Task mixed_6()
+            {
+                var result1 = Core.Result.Result.OkAsync(Guid.NewGuid().ToString());
+                var result2 = Core.Result.Result.FailAsync<string>(ErrorMessage1);
+                var result3 = Core.Result.Result.OkAsync(Guid.NewGuid().ToString());
+                var result4 = Core.Result.Result.FailAsync<string>(ErrorMessage2);
+
+                var result = await Core.Result.Result.CombineAllAsync(result1, result2, result3, result4);
+
+                result.ShouldBeFailureWithError($"{ErrorMessage1};{ErrorMessage2}");
+            }
+
+            [Fact]
+            public async Task mixed_7()
+            {
+                var result1 = Core.Result.Result.OkAsync(Guid.NewGuid().ToString());
+                var result2 = Core.Result.Result.FailAsync<string>(ErrorMessage1);
+                var result3 = Core.Result.Result.FailAsync<string>(ErrorMessage2);
+                var result4 = Core.Result.Result.OkAsync(Guid.NewGuid().ToString());
+
+                var result = await Core.Result.Result.CombineAllAsync(result1, result2, result3, result4);
+
+                result.ShouldBeFailureWithError($"{ErrorMessage1};{ErrorMessage2}");
+            }
+
+            [Fact]
+            public async Task mixed_8()
             {
                 var result1 = Core.Result.Result.OkAsync(Guid.NewGuid().ToString());
                 var result2 = Core.Result.Result.FailAsync<string>(ErrorMessage1);
@@ -269,7 +571,33 @@ public class ResultCombineAllTests
 
                 var result = await Core.Result.Result.CombineAllAsync(result1, result2, result3, result4);
 
-                result.ShouldBeFailureWithError($"{ErrorMessage1}");
+                result.ShouldBeFailureWithError(ErrorMessage1);
+            }
+
+            [Fact]
+            public async Task mixed_9()
+            {
+                var result1 = Core.Result.Result.OkAsync(Guid.NewGuid().ToString());
+                var result2 = Core.Result.Result.OkAsync(Guid.NewGuid().ToString());
+                var result3 = Core.Result.Result.FailAsync<string>(ErrorMessage1);
+                var result4 = Core.Result.Result.OkAsync(Guid.NewGuid().ToString());
+
+                var result = await Core.Result.Result.CombineAllAsync(result1, result2, result3, result4);
+
+                result.ShouldBeFailureWithError(ErrorMessage1);
+            }
+
+            [Fact]
+            public async Task mixed_10()
+            {
+                var result1 = Core.Result.Result.OkAsync(Guid.NewGuid().ToString());
+                var result2 = Core.Result.Result.OkAsync(Guid.NewGuid().ToString());
+                var result3 = Core.Result.Result.OkAsync(Guid.NewGuid().ToString());
+                var result4 = Core.Result.Result.FailAsync<string>(ErrorMessage1);
+
+                var result = await Core.Result.Result.CombineAllAsync(result1, result2, result3, result4);
+
+                result.ShouldBeFailureWithError(ErrorMessage1);
             }
         }
     }

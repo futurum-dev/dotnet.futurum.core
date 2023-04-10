@@ -2,7 +2,7 @@
 
 namespace Futurum.Core.Result;
 
-public static partial class ResultExtensions
+public static partial class ResultEnumerableExtensions
 {
     /// <summary>
     /// Transforms each element of a sequence to an <see cref="IEnumerable{T}"/> and flattens the resulting sequences into one sequence.
@@ -120,7 +120,7 @@ public static partial class ResultExtensions
     /// </list>
     /// </summary>
     public static Result<IEnumerable<TR>> FlatMap<T, TR>(this Result<IEnumerable<T>> resultSource, Func<T, Result<IEnumerable<TR>>> func) =>
-        resultSource.FlatMap(func, Combine);
+        resultSource.FlatMap(func, ResultExtensions.Combine);
 
     /// <summary>
     /// Transforms each element of a sequence to an <see cref="IEnumerable{T}"/> and flattens the resulting sequences into one sequence.

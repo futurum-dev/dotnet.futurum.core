@@ -4,7 +4,8 @@ namespace Futurum.Core.Result;
 
 public readonly partial struct Result
 {
-    private static readonly Result ResultOk = new(true);
+    private const bool OkIsSuccess = true;
+    private static readonly Result ResultOk = new(OkIsSuccess);
     private static readonly Task<Result> ResultOkAsync = Task.FromResult(ResultOk);
 
     /// <summary>

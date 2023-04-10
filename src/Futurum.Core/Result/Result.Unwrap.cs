@@ -21,7 +21,7 @@ public static partial class ResultExtensions
     {
         if (result.IsFailure)
         {
-            throw new Exception(result.Error.Value.ToErrorString(","));
+            throw new Exception(result.Error.Value.ToErrorString());
         }
     }
 
@@ -44,7 +44,7 @@ public static partial class ResultExtensions
     {
         if (result.IsFailure)
         {
-            throw new Exception(result.Error.Value.ToErrorString(","));
+            throw new Exception(result.Error.Value.ToErrorString());
         }
 
         return result.Value.Value;
@@ -71,7 +71,7 @@ public static partial class ResultExtensions
 
         if (result.IsFailure)
         {
-            throw new Exception(result.Error.Value.ToErrorString(","));
+            throw new Exception(result.Error.Value.ToErrorString());
         }
     }
 
@@ -96,7 +96,7 @@ public static partial class ResultExtensions
 
         if (result.IsFailure)
         {
-            throw new Exception(result.Error.Value.ToErrorString(","));
+            throw new Exception(result.Error.Value.ToErrorString());
         }
 
         return result.Value.Value;
